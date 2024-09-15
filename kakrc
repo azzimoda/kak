@@ -124,8 +124,6 @@ plug "kak-lsp/kak-lsp" do %{
     }
 }
 
-# plug "tom-huntington/simple-git-gutter.kak"
-
 # Commands #####################################################################
 
 define-command -hidden -params 1 _dfmt %{ nop %sh{ dfmt -t tab -i $1 } }
@@ -157,19 +155,19 @@ map global user y '<a-|>xsel -i -b<ret>' -docstring "Yank to system clipboard"
 map global user p '<a-!>xsel -o -b<ret>' -docstring "Paste after selection from system clipboard"
 map global user P '!xsel -o -b<ret>' -docstring "Paste before selection from system clipboard"
 map global user c ':comment-line<ret>' -docstring "(Un)comment line"
-map global user t ':set buffer indentwidth ' -docstring "`:set buffer indentwidth `"
-map global user / ':debug %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
-map global user [ ':enter-user-mode bracket-wrapping<ret>' -docstring "Chose a bracket to wrap the selection."
-map global user g ': enter-user-mode git' -docstring "Run git command…"
+map global user t ': set buffer indentwidth ' -docstring "`:set buffer indentwidth `"
+map global user / ':echo %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
+map global user [ ': enter-user-mode bracket-wrapping<ret>' -docstring "Chose a bracket to wrap the selection."
+map global user g ': enter-user-mode git<ret>' -docstring "Run git command…"
 
-map global bracket-wrapping [ 'i[<esc>a]<esc>' # i[<esc>"pP
-map global bracket-wrapping { 'i{<esc>a}<esc>' # i{<esc>"pP
-map global bracket-wrapping ( 'i(<esc>a)<esc>' # i(<esc>"pP
+map global bracket-wrapping [ 'i[<esc>a]<esc>H'
+map global bracket-wrapping { 'i{<esc>a}<esc>H'
+map global bracket-wrapping ( 'i(<esc>a)<esc>H'
 map global bracket-wrapping <space> '"pP' -docstring "Cancel"
 
-map global git d ': git show-diff' -docstring "show-diff"
-map global git D ': git hide-diff' -docstring "hide-diff"
-map global git u ':git update-diff' -docstring "update-diff"
+map global git d ': git show-diff<ret>' -docstring "show-diff"
+map global git D ': git hide-diff<ret>' -docstring "hide-diff"
+map global git u ':git update-diff<ret>' -docstring "update-diff"
 
 # Hooks ########################################################################
 
