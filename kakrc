@@ -49,9 +49,6 @@ plug "kak-lsp/kak-lsp" do %{
     cargo build --release --locked
     cargo install --force --path .
 } config %{
-    echo "kak-lsp have been configured"
-    nop %sh{ echo "kak-lsp have been configured" }
-
     # uncomment to enable debugging
     eval %sh{echo ${kak_opt_lsp_cmd} >> /tmp/kak-lsp.log}
     set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
@@ -105,16 +102,25 @@ plug "kak-lsp/kak-lsp" do %{
             [rust-analyzer]
             root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
             settings_section = "rust-analyzer"
-            [rust-analyzer.settings.rust-analyzer]
         }
+        echo -debug 'LSP `rust-analyzer` is loaded.'
+    }
+    hook global BufSetOption filetype=d %{
+        echo "serve-d is running…"
+        set-option buffer lsp_servers %exp{
+            [serve-d]
+            root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
+            settings_section = "serve-d"
+        }
+        echo -debug 'LSP `serve-d` is loaded.'
     }
     hook global BufSetOption filetype=(c|cpp) %{
         set-option buffer lsp_servers %exp{
             [clangd]
             root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
             settings_section = "clangd"
-            [clangd.settings.clangd]
         }
+        echo -debug 'LSP `clangd` is loaded.'
         # set-option buffer lsp_servers %exp{
         #     [ccls]
         #     root = "%sh{eval " $kak_opt_lsp_find_root " .ccls $(: kak_buffile)}"
