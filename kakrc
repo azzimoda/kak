@@ -95,44 +95,11 @@ plug "kak-lsp/kak-lsp" do %{
     }
 
     hook global KakEnd .* lsp-exit
-
-    # LSP configs
-    hook global BufSetOption filetype=rust %{
-        set-option buffer lsp_servers %exp{
-            [rust-analyzer]
-            root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
-            settings_section = "rust-analyzer"
-        }
-        echo -debug 'LSP `rust-analyzer` is loaded.'
-    }
-    hook global BufSetOption filetype=d %{
-        echo "serve-d is running…"
-        set-option buffer lsp_servers %exp{
-            [serve-d]
-            root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
-            settings_section = "serve-d"
-        }
-        echo -debug 'LSP `serve-d` is loaded.'
-    }
-    hook global BufSetOption filetype=(c|cpp) %{
-        set-option buffer lsp_servers %exp{
-            [clangd]
-            root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
-            settings_section = "clangd"
-        }
-        echo -debug 'LSP `clangd` is loaded.'
-        # set-option buffer lsp_servers %exp{
-        #     [ccls]
-        #     root = "%sh{eval " $kak_opt_lsp_find_root " .ccls $(: kak_buffile)}"
-        #     settings_section = "ccls"
-        #     [ccls.settings.ccls]
-        # }
-    }
 }
 
 # Commands #####################################################################
 
-define-command -hidden -params 1 _dfmt %{ nop %sh{ dfmt -t tab -i $1 } }
+define-command -hidden -params 1 _dfmt %{ echo -debug %sh{ dfmt -t tab -i $1 } }
 define-command dfmt %{ _dfmt %reg{%} }
 
 alias global W write-all
@@ -162,7 +129,7 @@ map global user p '<a-!>xsel -o -b<ret>' -docstring "Paste after selection from 
 map global user P '!xsel -o -b<ret>' -docstring "Paste before selection from system clipboard"
 map global user c ':comment-line<ret>' -docstring "(Un)comment line"
 map global user t ': set buffer indentwidth ' -docstring "`:set buffer indentwidth `"
-map global user / ':echo %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
+map global user / ':echo -debug %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
 map global user [ ': enter-user-mode bracket-wrapping<ret>' -docstring "Chose a bracket to wrap the selection."
 map global user g ': enter-user-mode git<ret>' -docstring "Run git command…"
 
@@ -176,6 +143,38 @@ map global git D ': git hide-diff<ret>' -docstring "hide-diff"
 map global git u ':git update-diff<ret>' -docstring "update-diff"
 
 # Hooks ########################################################################
+
+hook global BufSetOption filetype=rust %{
+    set-option buffer lsp_servers %exp{
+        [rust-analyzer]
+        root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
+        settings_section = "rust-analyzer"
+    }
+    echo -debug 'LSP `rust-analyzer` is loaded.'
+}
+hook global BufSetOption filetype=d %{
+    echo "serve-d is running…"
+    set-option buffer lsp_servers %exp{
+        [serve-d]
+        root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
+        settings_section = "serve-d"
+    }
+    echo -debug 'LSP `serve-d` is loaded.'
+}
+hook global BufSetOption filetype=(c|cpp) %{
+    set-option buffer lsp_servers %exp{
+        [clangd]
+        root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
+        settings_section = "clangd"
+    }
+    echo -debug 'LSP `clangd` is loaded.'
+    # set-option buffer lsp_servers %exp{
+    #     [ccls]
+    #     root = "%sh{eval " $kak_opt_lsp_find_root " .ccls $(: kak_buffile)}"
+    #     settings_section = "ccls"
+    #     [ccls.settings.ccls]
+    # }
+}
 
 # Config #######################################################################
 
