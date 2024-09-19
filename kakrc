@@ -129,7 +129,7 @@ map global user p '<a-!>xsel -o -b<ret>' -docstring "Paste after selection from 
 map global user P '!xsel -o -b<ret>' -docstring "Paste before selection from system clipboard"
 map global user c ':comment-line<ret>' -docstring "(Un)comment line"
 map global user t ': set buffer indentwidth ' -docstring "`:set buffer indentwidth `"
-map global user / ':echo -debug %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
+map global user : ':echo -debug %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
 map global user [ ': enter-user-mode bracket-wrapping<ret>' -docstring "Chose a bracket to wrap the selection."
 map global user g ': enter-user-mode git<ret>' -docstring "Run git command…"
 
