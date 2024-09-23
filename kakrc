@@ -31,7 +31,7 @@ plug "andreyorst/smarttab.kak" defer %{
 } config %{
     hook global BufOpenFile .* expandtab
     hook global BufNewFile  .* expandtab
-    hook global WinSetOption filetype=asm noexpandtab
+    hook global WinSetOption filetype=(gas|asm) noexpandtab
 }
 
 
