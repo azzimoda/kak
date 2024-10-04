@@ -74,7 +74,7 @@ plug "kak-lsp/kak-lsp" do %{
         lsp-stop
         lsp-start
     }
-    hook global WinSetOption filetype=(c|cpp|cc|rust|javascript|typescript) %{
+    hook global WinSetOption filetype=(c|cpp|cc|rust|javascript|typescript|d) %{
         set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor false
         lsp-auto-hover-enable
@@ -153,13 +153,15 @@ hook global BufSetOption filetype=rust %{
     echo -debug 'LSP `rust-analyzer` is loaded.'
 }
 hook global BufSetOption filetype=d %{
-    echo "serve-d is running…"
     set-option buffer lsp_servers %exp{
-        [serve-d]
-        root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
-        settings_section = "serve-d"
+        # [serve-d]
+        # root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
+        # settings_section = "serve-d"
+        [dls]
+        root = "%sh{eval " $kak_opt_lsp_find_root " dub.sdl dub.json $(: kak_buffile)}"
+        settings_section = "dls"
+        [dls.settings.dls]
     }
-    echo -debug 'LSP `serve-d` is loaded.'
 }
 hook global BufSetOption filetype=(c|cpp) %{
     set-option buffer lsp_servers %exp{
@@ -174,6 +176,10 @@ hook global BufSetOption filetype=(c|cpp) %{
     #     settings_section = "ccls"
     #     [ccls.settings.ccls]
     # }
+}
+
+hook global BufSetOption filetype=ruby %{
+    set-option buffer indentwidth 2
 }
 
 # Config #######################################################################
