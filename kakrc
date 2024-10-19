@@ -109,10 +109,12 @@ alias global W write-all
 declare-user-mode bracket-wrapping
 declare-user-mode git
 
-map global user l %{:enter-user-mode lsp<ret>} -docstring "LSP mode"
+map global user l %{:enter-user-mode lsp<ret>}
+    -docstring "LSP mode"
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' \
     -docstring 'Select next snippet placeholder'
-map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
+map global object a '<a-semicolon>lsp-object<ret>'
+    -docstring 'LSP any symbol'
 map global object <a-a> '<a-semicolon>lsp-object<ret>' \
     -docstring 'LSP any symbol'
 map global object f '<a-semicolon>lsp-object Function Method<ret>' \
@@ -124,23 +126,35 @@ map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>'
 map global object D '<a-semicolon>lsp-diagnostic-object<ret>' \
     -docstring 'LSP errors'
 
-map global user y '<a-|>xsel -i -b<ret>' -docstring "Yank to system clipboard"
-map global user p '<a-!>xsel -o -b<ret>' -docstring "Paste after selection from system clipboard"
-map global user P '!xsel -o -b<ret>' -docstring "Paste before selection from system clipboard"
-map global user c ':comment-line<ret>' -docstring "(Un)comment line"
-map global user t ': set buffer indentwidth ' -docstring "`:set buffer indentwidth `"
-map global user : ':echo -debug %sh{  }<left><left>' -docstring "`:debug %sh{  }<left><left>`"
-map global user [ ': enter-user-mode bracket-wrapping<ret>' -docstring "Chose a bracket to wrap the selection."
-map global user g ': enter-user-mode git<ret>' -docstring "Run git command…"
+map global user y '<a-|>xsel -i -b<ret>'
+    -docstring "Yank to system clipboard"
+map global user p '<a-!>xsel -o -b<ret>'
+    -docstring "Paste after selection from system clipboard"
+map global user P '!xsel -o -b<ret>'
+    -docstring "Paste before selection from system clipboard"
+map global user c ':comment-line<ret>'
+    -docstring "(Un)comment line"
+map global user t ': set buffer indentwidth '
+    -docstring "`:set buffer indentwidth `"
+map global user : ':echo -debug %sh{  }<left><left>'
+    -docstring "`:debug %sh{  }<left><left>`"
+map global user [ ': enter-user-mode bracket-wrapping<ret>'
+    -docstring "Chose a bracket to wrap the selection."
+map global user g ': enter-user-mode git<ret>'
+    -docstring "Run git command…"
 
 map global bracket-wrapping [ 'i[<esc>a]<esc>H'
 map global bracket-wrapping { 'i{<esc>a}<esc>H'
 map global bracket-wrapping ( 'i(<esc>a)<esc>H'
-map global bracket-wrapping <space> '"pP' -docstring "Cancel"
+map global bracket-wrapping <space> '"pP'
+    -docstring "Cancel"
 
-map global git d ': git show-diff<ret>' -docstring "show-diff"
-map global git D ': git hide-diff<ret>' -docstring "hide-diff"
-map global git u ':git update-diff<ret>' -docstring "update-diff"
+map global git d ': git show-diff<ret>'
+    -docstring "show-diff"
+map global git D ': git hide-diff<ret>'
+    -docstring "hide-diff"
+map global git u ':git update-diff<ret>'
+    -docstring "update-diff"
 
 # Hooks ########################################################################
 
@@ -150,7 +164,7 @@ hook global BufSetOption filetype=ruby %{
         root = "%sh{eval " $kak_opt_lsp_find_root " Gemfile Gemfile.lock $(: kak_buffile)}"
         settings_section = "solargraph"
     }
-    echo -debug 'LSP `solargraph` is loaded.'
+    echo -debug 'LSP `solargraph` is configured.'
 }
 hook global BufSetOption filetype=rust %{
     set-option buffer lsp_servers %exp{
@@ -158,13 +172,14 @@ hook global BufSetOption filetype=rust %{
         root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
         settings_section = "rust-analyzer"
     }
-    echo -debug 'LSP `rust-analyzer` is loaded.'
+    echo -debug 'LSP `rust-analyzer` is configured.'
 }
 hook global BufSetOption filetype=d %{
     set-option buffer lsp_servers %exp{
         # [serve-d]
         # root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
         # settings_section = "serve-d"
+        # [dls.settings.dls]
         [dls]
         root = "%sh{eval " $kak_opt_lsp_find_root " dub.sdl dub.json $(: kak_buffile)}"
         settings_section = "dls"
@@ -176,14 +191,9 @@ hook global BufSetOption filetype=(c|cpp) %{
         [clangd]
         root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
         settings_section = "clangd"
+        [clangd.settings.clangd]
     }
-    echo -debug 'LSP `clangd` is loaded.'
-    # set-option buffer lsp_servers %exp{
-    #     [ccls]
-    #     root = "%sh{eval " $kak_opt_lsp_find_root " .ccls $(: kak_buffile)}"
-    #     settings_section = "ccls"
-    #     [ccls.settings.ccls]
-    # }
+    echo -debug 'LSP `clangd` is configured.'
 }
 
 hook global BufSetOption filetype=(ruby|html) %{
