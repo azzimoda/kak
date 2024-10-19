@@ -144,6 +144,14 @@ map global git u ':git update-diff<ret>' -docstring "update-diff"
 
 # Hooks ########################################################################
 
+hook global BufSetOption filetype=ruby %{
+    set-option buffer lsp_servers %exp{
+        [solargraph]
+        root = "%sh{eval " $kak_opt_lsp_find_root " Gemfile Gemfile.lock $(: kak_buffile)}"
+        settings_section = "solargraph"
+    }
+    echo -debug 'LSP `solargraph` is loaded.'
+}
 hook global BufSetOption filetype=rust %{
     set-option buffer lsp_servers %exp{
         [rust-analyzer]
