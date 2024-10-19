@@ -74,12 +74,12 @@ plug "kak-lsp/kak-lsp" do %{
     #     lsp-stop
     #     lsp-start
     # }
-    hook global WinSetOption filetype=(c|cpp|cc|rust|javascript|typescript|d) %{
+    hook global WinSetOption filetype=(c|cpp|cc|rust|ruby) %{ # |javascript|typescript|d
         set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor false
         lsp-auto-hover-enable
         echo -debug "Enabling LSP for filtetype %opt{filetype}"
-        lsp-enable-window
+        lsp-enable
     }
 
     hook global WinSetOption filetype=(rust) %{
@@ -162,7 +162,10 @@ hook global BufSetOption filetype=ruby %{
     set-option buffer lsp_servers %exp{
         [solargraph]
         root = "%sh{eval " $kak_opt_lsp_find_root " Gemfile Gemfile.lock $(: kak_buffile)}"
+        command = "solargraph"
+        args = ["stdio"]
         settings_section = "solargraph"
+        [solargraph.settings.solargraph]
     }
     echo -debug 'LSP `solargraph` is configured.'
 }
