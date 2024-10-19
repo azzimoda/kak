@@ -178,7 +178,7 @@ hook global BufSetOption filetype=(c|cpp) %{
     # }
 }
 
-hook global BufSetOption filetype=ruby %{
+hook global BufSetOption filetype=(ruby|html) %{
     set-option buffer indentwidth 2
 }
 
