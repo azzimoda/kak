@@ -70,10 +70,10 @@ plug "kak-lsp/kak-lsp" do %{
         lsp-find-error --previous --include-warnings
     }
 
-    define-command lsp-restart -docstring 'restart lsp server' %{
-        lsp-stop
-        lsp-start
-    }
+    # define-command lsp-restart -docstring 'restart lsp server' %{
+    #     lsp-stop
+    #     lsp-start
+    # }
     hook global WinSetOption filetype=(c|cpp|cc|rust|javascript|typescript|d) %{
         set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor false
