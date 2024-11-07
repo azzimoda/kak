@@ -169,6 +169,7 @@ hook global BufSetOption filetype=ruby %{
     }
     echo -debug 'LSP `solargraph` is configured.'
 }
+
 hook global BufSetOption filetype=rust %{
     set-option buffer lsp_servers %exp{
         [rust-analyzer]
@@ -177,6 +178,7 @@ hook global BufSetOption filetype=rust %{
     }
     echo -debug 'LSP `rust-analyzer` is configured.'
 }
+
 hook global BufSetOption filetype=d %{
     set-option buffer lsp_servers %exp{
         # [serve-d]
@@ -189,6 +191,7 @@ hook global BufSetOption filetype=d %{
         [dls.settings.dls]
     }
 }
+
 hook global BufSetOption filetype=(c|cpp) %{
     set-option buffer lsp_servers %exp{
         [clangd]
@@ -205,6 +208,6 @@ hook global BufSetOption filetype=(ruby|html) %{
 
 # Config #######################################################################
 
-colorscheme default
+colorscheme solarized-dark
 add-highlighter global/ number-lines -relative
 
