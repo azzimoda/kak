@@ -104,37 +104,37 @@ define-command dfmt-buffer %{ dfmt %reg{%} }                            -docstri
 
 alias global W write-all
 
-# Mapping ######################################################################
+# Mappings ######################################################################
 
 declare-user-mode wrap-selections
 declare-user-mode git
 declare-user-mode toggle-highlighter
 
 # kak-lsp
-map global user l %{:enter-user-mode lsp<ret>}                                   -docstring "LSP mode"
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
 map global object a '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
 map global object <a-a> '<a-semicolon>lsp-object<ret>'                           -docstring 'LSP any symbol'
-map global object f '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
-map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
 map global object D '<a-semicolon>lsp-diagnostic-object<ret>'                    -docstring 'LSP errors'
+map global object f '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
+map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 
 # My mappings
-map global user y '<a-|>xsel -i -b<ret>'                      -docstring "Yank to system clipboard"
-map global user p '<a-!>xsel -o -b<ret>'                      -docstring "Paste after selection from system clipboard"
-map global user P '!xsel -o -b<ret>'                          -docstring "Paste before selection from system clipboard"
-map global user R 'd!xsel -o -b<ret>'                         -docstring 'Replace selection from system clipboard'
-map global user c ':comment-line<ret>'                        -docstring "(Un)comment line"
-map global user t ': set buffer indentwidth '                 -docstring 'Set buffer indent width'
-map global user : ':echo -debug %sh{  }<left><left>'          -docstring 'Run a shell prompt'
-map global user [ ': enter-user-mode wrap-selections<ret>'    -docstring "Chose a bracket to wrap the selection"
-map global user g ': enter-user-mode git<ret>'                -docstring "Git command"
+map global user c ':comment-line<ret>'                        -docstring '(Un)comment line'
+map global user g ': enter-user-mode git<ret>'                -docstring 'Git command'
 map global user h ': enter-user-mode toggle-highlighter<ret>' -docstring 'Toggle highlighter'
+map global user l ': enter-user-mode lsp<ret>'                -docstring 'LSP mode'
+map global user p '<a-!>xsel -o -b<ret>'                      -docstring 'Paste after selection from system clipboard'
+map global user P '!xsel -o -b<ret>'                          -docstring 'Paste before selection from system clipboard'
+map global user R 'd!xsel -o -b<ret>'                         -docstring 'Replace selection from system clipboard'
+map global user t ': set buffer indentwidth '                 -docstring 'Set buffer indent width'
+map global user y '<a-|>xsel -i -b<ret>'                      -docstring 'Yank to system clipboard'
+map global user : ':echo -debug %sh{  }<left><left>'          -docstring 'Run a shell prompt'
+map global user [ ': enter-user-mode wrap-selections<ret>'    -docstring 'Chose a bracket to wrap the selection'
 
+map global wrap-selections ( '\i(<esc>\a)<esc>H'
 map global wrap-selections [ '\i[<esc>\a]<esc>H'
 map global wrap-selections { '\i{<esc>\a}<esc>H'
-map global wrap-selections ( '\i(<esc>\a)<esc>H'
 map global wrap-selections < '\i<lt><esc>\a<gt><esc>H'
 map global wrap-selections \' '\i''<esc>\a''<esc>H'
 map global wrap-selections \" '\i"<esc>\a"<esc>H'
