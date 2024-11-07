@@ -1,4 +1,4 @@
-# [{(<'"Plugins"'>)}] ######################################################################
+# Plugins ######################################################################
 
 evaluate-commands %sh{
     plugins="$kak_config/plugins"
@@ -144,7 +144,7 @@ map global git D ': git hide-diff<ret>'   -docstring "hide-diff"
 map global git u ': git update-diff<ret>' -docstring "update-diff"
 
 map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'    -docstring 'Add highlighter buffer/wrap'
-map global toggle-highlighter W ': remover-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
+map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
 
 # Hooks ########################################################################
 
