@@ -19,6 +19,10 @@ plug "alexherbo2/auto-pairs.kak"
 enable-auto-pairs
 
 
+plug "mesabloo/tex-input.kak" config %{
+    tex-input-setup
+}
+
 plug "andreyorst/powerline.kak" defer powerline_gruvbox %{
     powerline-theme gruvbox
 } config %{
@@ -70,11 +74,7 @@ plug "kak-lsp/kak-lsp" do %{
         lsp-find-error --previous --include-warnings
     }
 
-    # define-command lsp-restart -docstring 'restart lsp server' %{
-    #     lsp-stop
-    #     lsp-start
-    # }
-    hook global WinSetOption filetype=(c|cpp|cc|rust|ruby) %{ # |javascript|typescript|d
+    hook global WinSetOption filetype=(c|cpp|cc|rust|ruby|tex|latex) %{
         set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor false
         lsp-auto-hover-enable
@@ -127,7 +127,8 @@ map global user l ': enter-user-mode lsp<ret>'                -docstring 'LSP mo
 map global user p '<a-!>xsel -o -b<ret>'                      -docstring 'Paste after selection from system clipboard'
 map global user P '!xsel -o -b<ret>'                          -docstring 'Paste before selection from system clipboard'
 map global user R 'd!xsel -o -b<ret>'                         -docstring 'Replace selection from system clipboard'
-map global user t ': set buffer indentwidth '                 -docstring 'Set buffer indent width'
+map global user t ': enter-user-mode tmux'                    -docstring 'tmux'
+map global user T ': tex-input-toggle<ret>'                   -docstring 'Toggle TeX input'
 map global user y '<a-|>xsel -i -b<ret>'                      -docstring 'Yank to system clipboard'
 map global user : ':echo -debug %sh{  }<left><left>'          -docstring 'Run a shell prompt'
 map global user [ ': enter-user-mode wrap-selections<ret>'    -docstring 'Chose a bracket to wrap the selection'
@@ -146,6 +147,21 @@ map global git u ': git update-diff<ret>' -docstring "update-diff"
 map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'    -docstring 'Add highlighter buffer/wrap'
 map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
 
+declare-user-mode tmux
+
+map global tmux l ": tmux-repl-horizontal<ret>" \
+    -docstring "tmux-repl-horisontal"
+map global tmux j ": tmux-repl-vertical<ret>" \
+    -docstring "tmux-repl-vertical"
+map global tmux w ": tmux-repl-window<ret>" \
+    -docstring "tmux-repl-window"
+map global tmux L ": tmux-terminal-horizontal " \
+    -docstring "tmux-terminal-horisontal"
+map global tmux J ": tmux-terminal-vertical " \
+    -docstring "tmux-terminal-vertical"
+map global tmux W ": tmux-terminal-window " \
+    -docstring "tmux-terminal-window"
+
 # Hooks ########################################################################
 
 hook global BufSetOption filetype=ruby %{
@@ -160,6 +176,7 @@ hook global BufSetOption filetype=ruby %{
     echo -debug 'LSP `solargraph` is configured.'
 }
 
+
 hook global BufSetOption filetype=rust %{
     set-option buffer lsp_servers %exp{
         [rust-analyzer]
@@ -169,18 +186,16 @@ hook global BufSetOption filetype=rust %{
     echo -debug 'LSP `rust-analyzer` is configured.'
 }
 
+
 hook global BufSetOption filetype=d %{
     set-option buffer lsp_servers %exp{
-        # [serve-d]
-        # root = "%sh{eval " $kak_opt_lsp_find_root " dub.json source $(: kak_buffile)}"
-        # settings_section = "serve-d"
-        # [dls.settings.dls]
         [dls]
         root = "%sh{eval " $kak_opt_lsp_find_root " dub.sdl dub.json $(: kak_buffile)}"
         settings_section = "dls"
         [dls.settings.dls]
     }
 }
+
 
 hook global BufSetOption filetype=(c|cpp) %{
     set-option buffer lsp_servers %exp{
@@ -190,6 +205,15 @@ hook global BufSetOption filetype=(c|cpp) %{
         [clangd.settings.clangd]
     }
     echo -debug 'LSP `clangd` is configured.'
+}
+
+hook global BufSetOption filetype=(tex|latex) %{
+    set-option buffer lsp_servers %exp{
+        [texlab]
+        root = "%sh{eval " $kak_opt_lsp_find_root " $(: kak_buffile)}"
+        settings_section = "texlab"
+        [texlab.settings.texlab]
+    }
 }
 
 hook global BufSetOption filetype=(ruby|html) %{
