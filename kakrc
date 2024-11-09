@@ -56,6 +56,7 @@ plug "kak-lsp/kak-lsp" do %{
     # uncomment to enable debugging
     eval %sh{echo ${kak_opt_lsp_cmd} >> /tmp/kak-lsp.log}
     set global lsp_cmd "kak-lsp -s %val{session} -vvv --log /tmp/kak-lsp.log"
+    # set global lsp_cmd "kak-lsp -s %val{session}"
 
     # this is not necessary; the `lsp-enable-window` will take care of it
     # eval %sh{${kak_opt_lsp_cmd} --kakoune -s $kak_session}
@@ -173,7 +174,7 @@ hook global BufSetOption filetype=ruby %{
         settings_section = "solargraph"
         [solargraph.settings.solargraph]
     }
-    echo -debug 'LSP `solargraph` is configured.'
+    echo -debug 'LS `solargraph` is configured.'
 }
 
 
@@ -183,7 +184,7 @@ hook global BufSetOption filetype=rust %{
         root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
         settings_section = "rust-analyzer"
     }
-    echo -debug 'LSP `rust-analyzer` is configured.'
+    echo -debug 'LS `rust-analyzer` is configured.'
 }
 
 
@@ -194,6 +195,7 @@ hook global BufSetOption filetype=d %{
         settings_section = "dls"
         [dls.settings.dls]
     }
+    echo -debug 'LS `dls` is configured.'
 }
 
 
@@ -204,7 +206,7 @@ hook global BufSetOption filetype=(c|cpp) %{
         settings_section = "clangd"
         [clangd.settings.clangd]
     }
-    echo -debug 'LSP `clangd` is configured.'
+    echo -debug 'LS `clangd` is configured.'
 }
 
 hook global BufSetOption filetype=(tex|latex) %{
