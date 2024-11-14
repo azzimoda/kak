@@ -101,7 +101,7 @@ plug "kak-lsp/kak-lsp" do %{
 # Commands #####################################################################
 
 define-command -params 1 dfmt %{ echo -debug %sh{ dfmt -t tab -i $1 } } -docstring 'Format D file'
-define-command dfmt-buffer %{ dfmt %reg{%} }                            -docstring 'Format D code of current buffer'
+define-command dfmt-buffer %{ dfmt %reg{%} } -docstring 'Format D code of current buffer'
 
 alias global W write-all
 
@@ -109,26 +109,37 @@ alias global W write-all
 
 # kak-lsp
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
-map global object a '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
-map global object <a-a> '<a-semicolon>lsp-object<ret>'                           -docstring 'LSP any symbol'
-map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-map global object D '<a-semicolon>lsp-diagnostic-object<ret>'                    -docstring 'LSP errors'
-map global object f '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
-map global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
+map global object a     '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
+map global object <a-a> '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
+map global object d     '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
+map global object D     '<a-semicolon>lsp-diagnostic-object<ret>'                    -docstring 'LSP errors'
+map global object f     '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
+map global object t     '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 
 # My mappings
-map global user c ':comment-line<ret>'                        -docstring '(Un)comment line'
-map global user g ': enter-user-mode git<ret>'                -docstring 'Git command'
-map global user h ': enter-user-mode toggle-highlighter<ret>' -docstring 'Toggle highlighter'
-map global user l ': enter-user-mode lsp<ret>'                -docstring 'LSP mode'
-map global user p '<a-!>xsel -o -b<ret>'                      -docstring 'Paste after selection from system clipboard'
-map global user P '!xsel -o -b<ret>'                          -docstring 'Paste before selection from system clipboard'
-map global user R 'd!xsel -o -b<ret>'                         -docstring 'Replace selection from system clipboard'
-map global user t ': enter-user-mode tmux<ret>'               -docstring 'tmux'
-map global user T ': tex-input-toggle<ret>'                   -docstring 'Toggle TeX input'
-map global user y '<a-|>xsel -i -b<ret>'                      -docstring 'Yank to system clipboard'
-map global user : ':echo -debug %sh{  }<left><left>'          -docstring 'Run a shell prompt'
-map global user [ ': enter-user-mode wrap-selections<ret>'    -docstring 'Chose a bracket to wrap the selection'
+map global user b ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
+map global user g ': enter-user-mode git<ret>'                  -docstring 'Git command'
+map global user h ': enter-user-mode toggle-highlighter<ret>'   -docstring 'Toggle highlighter'
+map global user l ': enter-user-mode lsp<ret>'                  -docstring 'LSP mode'
+map global user p '<a-!>xsel -o -b<ret>'                        -docstring 'Paste after selection from system clipboard'
+map global user P '!xsel -o -b<ret>'                            -docstring 'Paste before selection from system clipboard'
+map global user R 'd!xsel -o -b<ret>'                           -docstring 'Replace selection from system clipboard'
+map global user t ': enter-user-mode tmux<ret>'                 -docstring 'tmux'
+map global user T ': tex-input-toggle<ret>'                     -docstring 'Toggle TeX input'
+map global user y '<a-|>xsel -i -b<ret>'                        -docstring 'Yank to system clipboard'
+map global user : ':echo -debug %sh{  }<left><left>'            -docstring 'Run a shell prompt'
+map global user / ':comment-line<ret>'                          -docstring '(Un)comment line'
+map global user [ ': enter-user-mode wrap-selections<ret>'      -docstring 'Chose a bracket to wrap the selection'
+
+declare-user-mode buffers-manipulation
+map global buffers-manipulation a     ': arrange-buffers '     -docstring 'Arrange buffers'
+map global buffers-manipulation d     ': delete-buffer<ret>'   -docstring 'Delete current buffer'
+map global buffers-manipulation D     ': delete-buffer '       -docstring 'Delete specified buffer'
+map global buffers-manipulation <a-d> ': delete-buffer!<ret>'  -docstring 'Delete current buffer (forced)'
+map global buffers-manipulation <a-D> ': delete-buffer! '      -docstring 'Delete specified buffer (forced)'
+map global buffers-manipulation n     ': buffer-next<ret>'     -docstring 'Next buffer'
+map global buffers-manipulation p     ': buffer-previous<ret>' -docstring 'Previous buffer'
+map global buffers-manipulation r     ': rename-buffer '       -docstring 'Rename current buffer'
 
 declare-user-mode wrap-selections
 map global wrap-selections ( '\i(<esc>\a)<esc>H'
@@ -139,20 +150,21 @@ map global wrap-selections \' '\i''<esc>\a''<esc>H'
 map global wrap-selections \" '\i"<esc>\a"<esc>H'
 
 declare-user-mode git
-map global git d ': git show-diff<ret>'   -docstring "show-diff"
-map global git D ': git hide-diff<ret>'   -docstring "hide-diff"
-map global git u ': git update-diff<ret>' -docstring "update-diff"
+map global git d '      : git show-diff<ret>'   -docstring "show-diff"
+map global git D '      : git hide-diff<ret>'   -docstring "hide-diff"
+map global git u '      : git update-diff<ret>' -docstring "update-diff"
+map global git <space> ': git update-diff<ret>' -docstring "update-diff"
 
 declare-user-mode toggle-highlighter
 map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'   -docstring 'Add highlighter buffer/wrap'
 map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
 
 declare-user-mode tmux
-map global tmux l ": tmux-repl-horizontal<ret>" -docstring "tmux-repl-horisontal"
-map global tmux j ": tmux-repl-vertical<ret>"   -docstring "tmux-repl-vertical"
+map global tmux h ": tmux-repl-horizontal<ret>" -docstring "tmux-repl-horisontal"
+map global tmux v ": tmux-repl-vertical<ret>"   -docstring "tmux-repl-vertical"
 map global tmux w ": tmux-repl-window<ret>"     -docstring "tmux-repl-window"
-map global tmux L ": tmux-terminal-horizontal " -docstring "tmux-terminal-horisontal"
-map global tmux J ": tmux-terminal-vertical "   -docstring "tmux-terminal-vertical"
+map global tmux H ": tmux-terminal-horizontal " -docstring "tmux-terminal-horisontal"
+map global tmux V ": tmux-terminal-vertical "   -docstring "tmux-terminal-vertical"
 map global tmux W ": tmux-terminal-window "     -docstring "tmux-terminal-window"
 
 # Hooks ########################################################################
