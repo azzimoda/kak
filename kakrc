@@ -100,10 +100,12 @@ plug "kak-lsp/kak-lsp" do %{
 
 # Commands #####################################################################
 
-define-command -params 1 dfmt %{ echo -debug %sh{ dfmt -t tab -i $1 } } -docstring 'Format D file'
+define-command dfmt -params 1 %{ echo -debug %sh{ dfmt -t tab -i $1 } } -docstring 'Format D file'
 define-command dfmt-buffer %{ dfmt %reg{%} } -docstring 'Format D code of current buffer'
+define-command translate -params 1..2 %{ echo -debug %sh{ trans $1 $2 } } -docstring 'translate [[<from>]:[<to>[+...]]] <it>: translate a word or a string'
 
 alias global W write-all
+alias global trans translate
 
 # Mappings ######################################################################
 
@@ -228,6 +230,7 @@ hook global BufSetOption filetype=(ruby|html) %{
 
 # Config #######################################################################
 
-colorscheme solarized-dark
+colorscheme solarized-dark-termcolors
+
 add-highlighter global/ number-lines -relative
 
