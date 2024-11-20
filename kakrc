@@ -108,6 +108,7 @@ alias global W write-all
 alias global trans translate
 
 # Mappings ######################################################################
+# TODO: todo
 
 # kak-lsp
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
@@ -119,19 +120,22 @@ map global object f     '<a-semicolon>lsp-object Function Method<ret>'          
 map global object t     '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 
 # My mappings
-map global user b ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
-map global user g ': enter-user-mode git<ret>'                  -docstring 'Git command'
-map global user h ': enter-user-mode toggle-highlighter<ret>'   -docstring 'Toggle highlighter'
-map global user l ': enter-user-mode lsp<ret>'                  -docstring 'LSP mode'
-map global user p '<a-!>xsel -o -b<ret>'                        -docstring 'Paste after selection from system clipboard'
-map global user P '!xsel -o -b<ret>'                            -docstring 'Paste before selection from system clipboard'
-map global user R 'd!xsel -o -b<ret>'                           -docstring 'Replace selection from system clipboard'
-map global user t ': enter-user-mode tmux<ret>'                 -docstring 'tmux'
-map global user T ': tex-input-toggle<ret>'                     -docstring 'Toggle TeX input'
-map global user y '<a-|>xsel -i -b<ret>'                        -docstring 'Yank to system clipboard'
-map global user : ':echo -debug %sh{  }<left><left>'            -docstring 'Run a shell prompt'
-map global user / ':comment-line<ret>'                          -docstring '(Un)comment line'
-map global user [ ': enter-user-mode wrap-selections<ret>'      -docstring 'Chose a bracket to wrap the selection'
+map global user G     '<esc>/\bTODO\b<ret>'     -docstring 'Goto next TODO'
+map global user <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
+
+map global user b     ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
+map global user g     ': enter-user-mode git<ret>'                  -docstring 'Git command'
+map global user h     ': enter-user-mode toggle-highlighter<ret>'   -docstring 'Toggle highlighter'
+map global user l     ': enter-user-mode lsp<ret>'                  -docstring 'LSP mode'
+map global user p     '<a-!>xsel -o -b<ret>'                        -docstring 'Paste after selection from system clipboard'
+map global user P     '!xsel -o -b<ret>'                            -docstring 'Paste before selection from system clipboard'
+map global user R     'd!xsel -o -b<ret>'                           -docstring 'Replace selection from system clipboard'
+map global user t     ': enter-user-mode tmux<ret>'                 -docstring 'tmux'
+map global user T     ': tex-input-toggle<ret>'                     -docstring 'Toggle TeX input'
+map global user y     '<a-|>xsel -i -b<ret>'                        -docstring 'Yank to system clipboard'
+map global user :     ':echo -debug %sh{  }<left><left>'            -docstring 'Run a shell prompt'
+map global user /     ':comment-line<ret>'                          -docstring '(Un)comment line'
+map global user [     ': enter-user-mode wrap-selections<ret>'      -docstring 'Chose a bracket to wrap the selection'
 
 declare-user-mode buffers-manipulation
 map global buffers-manipulation a     ': arrange-buffers '     -docstring 'Arrange buffers'
