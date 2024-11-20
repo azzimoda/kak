@@ -108,7 +108,6 @@ alias global W write-all
 alias global trans translate
 
 # Mappings ######################################################################
-# TODO: todo
 
 # kak-lsp
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
@@ -120,8 +119,8 @@ map global object f     '<a-semicolon>lsp-object Function Method<ret>'          
 map global object t     '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 
 # My mappings
-map global user G     '<esc>/\bTODO\b<ret>'     -docstring 'Goto next TODO'
-map global user <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
+map global goto G     '<esc>/\bTODO\b<ret>'     -docstring 'Goto next TODO'
+map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
 
 map global user b     ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
 map global user g     ': enter-user-mode git<ret>'                  -docstring 'Git command'
