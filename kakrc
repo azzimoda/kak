@@ -122,19 +122,25 @@ map global object t     '<a-semicolon>lsp-object Class Interface Struct<ret>'   
 map global goto G     '<esc>/\bTODO\b<ret>'     -docstring 'Goto next TODO'
 map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
 
-map global user b     ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
-map global user g     ': enter-user-mode git<ret>'                  -docstring 'Git command'
-map global user h     ': enter-user-mode toggle-highlighter<ret>'   -docstring 'Toggle highlighter'
-map global user l     ': enter-user-mode lsp<ret>'                  -docstring 'LSP mode'
-map global user p     '<a-!>xsel -o -b<ret>'                        -docstring 'Paste after selection from system clipboard'
-map global user P     '!xsel -o -b<ret>'                            -docstring 'Paste before selection from system clipboard'
-map global user R     'd!xsel -o -b<ret>'                           -docstring 'Replace selection from system clipboard'
-map global user t     ': enter-user-mode tmux<ret>'                 -docstring 'tmux'
-map global user T     ': tex-input-toggle<ret>'                     -docstring 'Toggle TeX input'
-map global user y     '<a-|>xsel -i -b<ret>'                        -docstring 'Yank to system clipboard'
-map global user :     ':echo -debug %sh{  }<left><left>'            -docstring 'Run a shell prompt'
-map global user /     ':comment-line<ret>'                          -docstring '(Un)comment line'
-map global user [     ': enter-user-mode wrap-selections<ret>'      -docstring 'Chose a bracket to wrap the selection'
+map global user b     ': enter-user-mode buffers-manipulation<ret>'                  -docstring 'Buffers matipulation'
+map global user g     ': enter-user-mode git<ret>'                                   -docstring 'Git command'
+map global user h     ': enter-user-mode toggle-highlighter<ret>'                    -docstring 'Toggle highlighter'
+map global user l     ': enter-user-mode lsp<ret>'                                   -docstring 'LSP mode'
+map global user p     '<a-!>xsel -o -b<ret>'                                         -docstring 'Paste after selection from system clipboard'
+map global user P     '!xsel -o -b<ret>'                                             -docstring 'Paste before selection from system clipboard'
+map global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>'     -docstring 'Crazy Powerline custom separators'
+map global user R     'd!xsel -o -b<ret>'                                            -docstring 'Replace selection from system clipboard'
+map global user t     ': enter-user-mode tmux<ret>'                                  -docstring 'tmux'
+map global user T     ': tex-input-toggle<ret>'                                      -docstring 'Toggle TeX input'
+map global user y     '<a-|>xsel -i -b<ret>'                                         -docstring 'Yank to system clipboard'
+map global user :     ':echo -debug %sh{  }<left><left>'                             -docstring 'Run a shell prompt'
+map global user /     ':comment-line<ret>'                                           -docstring '(Un)comment line'
+map global user [     ': enter-user-mode wrap-selections<ret>'                       -docstring 'Chose a bracket to wrap the selection'
+
+declare-user-mode crazy-powerline-custom-separators
+map global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>' -docstring 'Default (half-step)'
+map global crazy-powerline-custom-separators 5       ': powerline-separator custom 42 5<ret>' -docstring '42 5'
+map global crazy-powerline-custom-separators x       ': powerline-separator custom саси хуй<ret>' -docstring 'с**и х**'
 
 declare-user-mode buffers-manipulation
 map global buffers-manipulation a     ': arrange-buffers '     -docstring 'Arrange buffers'
@@ -174,7 +180,12 @@ map global tmux W ": tmux-terminal-window "     -docstring "tmux-terminal-window
 
 # Hooks ########################################################################
 
-hook global BufSetOption filetype=ruby %{
+hook global WinCreate .* %{
+    powerline-separator half-step
+    powerline-theme solarized-dark-termcolors
+}
+
+hook global -group kak-lsp-servers BufSetOption filetype=ruby %{
     set-option buffer lsp_servers %exp{
         [solargraph]
         root = "%sh{eval " $kak_opt_lsp_find_root " Gemfile Gemfile.lock $(: kak_buffile)}"
@@ -187,7 +198,7 @@ hook global BufSetOption filetype=ruby %{
 }
 
 
-hook global BufSetOption filetype=rust %{
+hook global -group kak-lsp-servers BufSetOption filetype=rust %{
     set-option buffer lsp_servers %exp{
         [rust-analyzer]
         root = "%sh{eval " $kak_opt_lsp_find_root " Cargo.toml src $(: kak_buffile)}"
@@ -197,7 +208,7 @@ hook global BufSetOption filetype=rust %{
 }
 
 
-hook global BufSetOption filetype=d %{
+hook global -group kak-lsp-servers BufSetOption filetype=d %{
     set-option buffer lsp_servers %exp{
         [dls]
         root = "%sh{eval " $kak_opt_lsp_find_root " dub.sdl dub.json $(: kak_buffile)}"
@@ -208,7 +219,7 @@ hook global BufSetOption filetype=d %{
 }
 
 
-hook global BufSetOption filetype=(c|cpp) %{
+hook global -group kak-lsp-servers BufSetOption filetype=(c|cpp) %{
     set-option buffer lsp_servers %exp{
         [clangd]
         root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
@@ -218,7 +229,7 @@ hook global BufSetOption filetype=(c|cpp) %{
     echo -debug 'LS `clangd` is configured.'
 }
 
-hook global BufSetOption filetype=(tex|latex) %{
+hook global -group kak-lsp-servers BufSetOption filetype=(tex|latex) %{
     set-option buffer lsp_servers %exp{
         [texlab]
         root = "%sh{eval " $kak_opt_lsp_find_root " $(: kak_buffile)}"
