@@ -1,5 +1,11 @@
 # Plugins ######################################################################
 
+# My
+echo -debug "[myDEBUG] Config dir: %val{config}"
+source "%val{config}/plugins/cyrillic.kak/cyrillic.kak"
+cyrillic-set-layout яжерты
+
+# Other
 evaluate-commands %sh{
     plugins="$kak_config/plugins"
     mkdir -p "$plugins"
@@ -153,10 +159,10 @@ map global buffers-manipulation p     ': buffer-previous<ret>' -docstring 'Previ
 map global buffers-manipulation r     ': rename-buffer '       -docstring 'Rename current buffer'
 
 declare-user-mode wrap-selections
-map global wrap-selections ( '\i(<esc>\a)<esc>H'
-map global wrap-selections [ '\i[<esc>\a]<esc>H'
-map global wrap-selections { '\i{<esc>\a}<esc>H'
-map global wrap-selections < '\i<lt><esc>\a<gt><esc>H'
+map global wrap-selections (  '\i(<esc>\a)<esc>H'
+map global wrap-selections [  '\i[<esc>\a]<esc>H'
+map global wrap-selections {  '\i{<esc>\a}<esc>H'
+map global wrap-selections <  '\i<lt><esc>\a<gt><esc>H'
 map global wrap-selections \' '\i''<esc>\a''<esc>H'
 map global wrap-selections \" '\i"<esc>\a"<esc>H'
 
