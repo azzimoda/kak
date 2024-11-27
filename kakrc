@@ -1,7 +1,8 @@
+echo -debug %sh{ruby ~/.config/kak/generate-config.rb}
+
 # Plugins ######################################################################
 
 # My
-echo -debug "[myDEBUG] Config dir: %val{config}"
 source "%val{config}/plugins/cyrillic.kak/cyrillic.kak"
 cyrillic-set-layout яжерты
 
@@ -81,13 +82,14 @@ plug "kak-lsp/kak-lsp" do %{
         lsp-find-error --previous --include-warnings
     }
 
-    hook global WinSetOption filetype=(c|cpp|cc|rust|ruby|tex|latex) %{
-        set-option window lsp_auto_highlight_references true
-        set-option window lsp_hover_anchor false
-        lsp-auto-hover-enable
-        echo -debug "Enabling LSP for filtetype %opt{filetype}"
-        lsp-enable-window
-    }
+    source "%val{config}/generated/lspEnableWindowHook.kak"
+    # hook global WinSetOption filetype=(c|cpp|cc|rust|ruby|tex|latex) %{
+    #     set-option window lsp_auto_highlight_references true
+    #     set-option window lsp_hover_anchor false
+    #     lsp-auto-hover-enable
+    #     echo -debug "Enabling LSP for filtetype %opt{filetype}"
+    #     lsp-enable-window
+    # }
 
     hook global WinSetOption filetype=(rust) %{
         set window lsp_server_configuration rust.clippy_preference="on"
