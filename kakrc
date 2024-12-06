@@ -2,11 +2,6 @@ echo -debug %sh{ruby ~/.config/kak/generate-config.rb}
 
 # Plugins ######################################################################
 
-# My
-source "%val{config}/plugins/cyrillic.kak/cyrillic.kak"
-cyrillic-set-layout яжерты
-
-# Other
 evaluate-commands %sh{
     plugins="$kak_config/plugins"
     mkdir -p "$plugins"
@@ -179,12 +174,22 @@ map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'   -docstri
 map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
 
 declare-user-mode tmux
-map global tmux h ": tmux-repl-horizontal<ret>" -docstring "tmux-repl-horisontal"
-map global tmux v ": tmux-repl-vertical<ret>"   -docstring "tmux-repl-vertical"
-map global tmux w ": tmux-repl-window<ret>"     -docstring "tmux-repl-window"
-map global tmux H ": tmux-terminal-horizontal " -docstring "tmux-terminal-horisontal"
-map global tmux V ": tmux-terminal-vertical "   -docstring "tmux-terminal-vertical"
-map global tmux W ": tmux-terminal-window "     -docstring "tmux-terminal-window"
+map global tmux h ": tmux-repl-horizontal<ret>"      -docstring "repl horisontal"
+map global tmux H ": tmux-terminal-horizontal "      -docstring "terminal horisontal"
+map global tmux k ": enter-user-mode tmux-kak<ret>"  -docstring "open new client in new panel"
+map global tmux v ": tmux-repl-vertical<ret>"        -docstring "repl vertical"
+map global tmux V ": tmux-terminal-vertical "        -docstring "terminal vertical"
+map global tmux w ": tmux-repl-window<ret>"          -docstring "repl window"
+map global tmux W ": tmux-terminal-window "          -docstring "terminal window"
+
+declare-user-mode tmux-kak
+map global tmux-kak h ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "horisontal"
+map global tmux-kak H ": tmux-terminal-horizontal kak -c %val{session} "     -docstring "horisontal with options"
+map global tmux-kak v ": tmux-terminal-vertical kak -c %val{session}<ret>"   -docstring "vertical"
+map global tmux-kak V ": tmux-terminal-vertical kak -c %val{session} "       -docstring "vertical with options"
+map global tmux-kak w ": tmux-terminal-window kak -c %val{session}<ret>"     -docstring "window"
+map global tmux-kak W ": tmux-terminal-window kak -c %val{session} "         -docstring "window with options"
+
 
 # Hooks ########################################################################
 

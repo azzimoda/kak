@@ -4,7 +4,7 @@ HARD_LANGS = 'rust ruby tex latex'.split' '
 
 all_langs = (EASY_LANGS + HARD_LANGS).join'|'
 
-system("mkdir -p ./#{GENERATED_CONFIG_DIR}")
+system("mkdir -p ~/.config/kak/#{GENERATED_CONFIG_DIR}")
 
 text = case ARGV[0]
 when 'lspEnableWindowHook'
