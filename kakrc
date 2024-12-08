@@ -1,4 +1,4 @@
-echo -debug %sh{ruby ~/.config/kak/generate-config.rb}
+echo -debug %sh{ruby ~/.config/kak/generate-config.rb lspEnableWindowHook}
 
 # Plugins ######################################################################
 
@@ -16,6 +16,20 @@ plug "andreyorst/plug.kak" noload
 source "%val{config}/plugins/wakatime.kak/wakatime.kak"
 plug "wakatime.kak" noload
 
+
+plug "gustavo-hms/luar" %{
+    require-module luar
+}
+
+plug "gustavo-hms/peneira" %{
+    require-module peneira
+}
+
+# plug "andreyorst/fzf.kak" config %{
+#     map global normal <c-p> ': fzf-mode<ret>'
+# } defer <module-name> %{
+#     <settings of module>
+# }
 
 plug "alexherbo2/auto-pairs.kak"
 enable-auto-pairs
@@ -41,15 +55,15 @@ plug "andreyorst/smarttab.kak" defer %{
 }
 
 
-plug "andreyorst/kaktree" config %{
-    hook global WinSetOption filetype=kaktree %{
-        remove-highlighter buffer/numbers
-        remove-highlighter buffer/matching
-        remove-highlighter buffer/wrap
-        remove-highlighter buffer/show-whitespaces
-    }
-    kaktree-enable
-}
+# plug "andreyorst/kaktree" config %{
+#     hook global WinSetOption filetype=kaktree %{
+#         remove-highlighter buffer/numbers
+#         remove-highlighter buffer/matching
+#         remove-highlighter buffer/wrap
+#         remove-highlighter buffer/show-whitespaces
+#     }
+#     kaktree-enable
+# }
 
 plug "kak-lsp/kak-lsp" do %{
     cargo build --release --locked
@@ -103,92 +117,158 @@ plug "kak-lsp/kak-lsp" do %{
 
 # Commands #####################################################################
 
-define-command dfmt -params 1 %{ echo -debug %sh{ dfmt -t tab -i $1 } } -docstring 'Format D file'
-define-command dfmt-buffer %{ dfmt %reg{%} } -docstring 'Format D code of current buffer'
-define-command translate -params 1..2 %{ echo -debug %sh{ trans $1 $2 } } -docstring 'translate [[<from>]:[<to>[+...]]] <it>: translate a word or a string'
+define-command -params 1 -docstring 'Format D file' dfmt %{ echo -debug %sh{ dfmt -t tab -i $1 } }
+define-command -docstring 'Format D code of current buffer' dfmt-buffer %{ dfmt %reg{%} }
+define-command -params 1..2 -docstring 'translate [[<from>]:[<to>[+...]]] <it>: translate a word or a string' \
+    translate %{ echo -debug %sh{ trans $1 $2 } }
+define-command -params 1 -docstring 'read <filename>: open the given filename in a readonly buffer' \
+    read %{
+    eval edit -readonly %arg{1}
+}
 
 alias global W write-all
 alias global trans translate
 
+# Peneira
+
+define-command peneira-buffers %{
+    peneira 'buffers: ' %{ printf '%s\n' $kak_quoted_buflist } %{
+        buffer %arg{1}
+    }
+}
+
+
 # Mappings ######################################################################
 
 # kak-lsp
-map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
-map global object a     '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
-map global object <a-a> '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
-map global object d     '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-map global object D     '<a-semicolon>lsp-diagnostic-object<ret>'                    -docstring 'LSP errors'
-map global object f     '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
-map global object t     '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
+map -docstring 'Select next snippet placeholder' \
+    global insert <tab> \
+    '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>'
+map -docstring 'LSP any symbol' \
+    global object a '<a-semicolon>lsp-object<ret>'
+map -docstring 'LSP any symbol' \
+    global object <a-a> '<a-semicolon>lsp-object<ret>'
+map -docstring 'LSP errors and warnings' \
+    global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>'
+map -docstring 'LSP errors' \
+    global object D '<a-semicolon>lsp-diagnostic-object<ret>'
+map -docstring 'LSP function or method' \
+    global object f '<a-semicolon>lsp-object Function Method<ret>'
+map -docstring 'LSP class interface or struct' \
+    global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'
 
 # My mappings
-map global goto G     '<esc>/\bTODO\b<ret>'     -docstring 'Goto next TODO'
-map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
+map -docstring 'Goto next TODO' \
+    global goto G '<esc>/\bTODO\b<ret>'
+map -docstring 'Goto previous TODO' \
+    global goto <a-G> '<esc><a-/>\bTODO\b<ret>'
 
-map global user b     ': enter-user-mode buffers-manipulation<ret>'                  -docstring 'Buffers matipulation'
-map global user g     ': enter-user-mode git<ret>'                                   -docstring 'Git command'
-map global user h     ': enter-user-mode toggle-highlighter<ret>'                    -docstring 'Toggle highlighter'
-map global user l     ': enter-user-mode lsp<ret>'                                   -docstring 'LSP mode'
-map global user p     '<a-!>xsel -o -b<ret>'                                         -docstring 'Paste after selection from system clipboard'
-map global user P     '!xsel -o -b<ret>'                                             -docstring 'Paste before selection from system clipboard'
-map global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>'     -docstring 'Crazy Powerline custom separators'
-map global user R     'd!xsel -o -b<ret>'                                            -docstring 'Replace selection from system clipboard'
-map global user t     ': enter-user-mode tmux<ret>'                                  -docstring 'tmux'
-map global user T     ': tex-input-toggle<ret>'                                      -docstring 'Toggle TeX input'
-map global user y     '<a-|>xsel -i -b<ret>'                                         -docstring 'Yank to system clipboard'
-map global user :     ':echo -debug %sh{  }<left><left>'                             -docstring 'Run a shell prompt'
-map global user /     ':comment-line<ret>'                                           -docstring '(Un)comment line'
-map global user [     ': enter-user-mode wrap-selections<ret>'                       -docstring 'Chose a bracket to wrap the selection'
+map -docstring 'Penetria shotcuts' \
+    global user <ret> ': enter-user-mode peneira-shotcuts<ret>'
+map -docstring 'Buffers matipulation' \
+    global user b ': enter-user-mode buffers-manipulation<ret>'
+map -docstring 'Git command' \
+    global user g ': enter-user-mode git<ret>'
+map -docstring 'Toggle highlighter' \
+    global user h ': enter-user-mode toggle-highlighter<ret>'
+map -docstring 'LSP mode' \
+    global user l ': enter-user-mode lsp<ret>'
+map -docstring 'Paste after selection from system clipboard' \
+    global user p '<a-!>xsel -o -b<ret>'
+map -docstring 'Paste before selection from system clipboard' \
+    global user P '!xsel -o -b<ret>'
+map -docstring 'Crazy Powerline custom separators' \
+    global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>'
+map -docstring 'Replace selection from system clipboard' \
+    global user R 'd!xsel -o -b<ret>'
+map -docstring 'tmux' \
+    global user t ': enter-user-mode tmux<ret>'
+map -docstring 'Toggle TeX input' \
+    global user T ': tex-input-toggle<ret>'
+map -docstring 'Yank to system clipboard' \
+    global user y '<a-|>xsel -i -b<ret>'
+map -docstring 'Run a shell prompt' \
+    global user : ':echo -debug %sh{  }<left><left>'
+map -docstring '(Un)comment line' \
+    global user / ':comment-line<ret>'
+map -docstring 'Chose a bracket to wrap the selection' \
+    global user [ ': enter-user-mode wrap-selections<ret>'
+
+declare-user-mode peneira-shotcuts
+map global peneira-shotcuts -docstring 'buffers'     b ':peneira-buffers<ret>'
+map global peneira-shotcuts -docstring 'files'       f ':peneira-files<ret>'
+map global peneira-shotcuts -docstring 'local files' F ':peneira-local-files<ret>'
+map global peneira-shotcuts -docstring 'lines'       l ':peneira-lines<ret>'
+map global peneira-shotcuts -docstring 'symbols'     s ':peneira-symbols<ret>'
 
 declare-user-mode crazy-powerline-custom-separators
-map global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>' -docstring 'Default (half-step)'
-map global crazy-powerline-custom-separators 5       ': powerline-separator custom 42 5<ret>' -docstring '42 5'
-map global crazy-powerline-custom-separators x       ': powerline-separator custom саси хуй<ret>' -docstring 'с**и х**'
+map -docstring 'Default (half-step)' \
+    global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>'
+map -docstring '42 5' \
+    global crazy-powerline-custom-separators 5 ': powerline-separator custom 42 5<ret>'
+map -docstring 'с**и х**' \
+    global crazy-powerline-custom-separators x ': powerline-separator custom саси хуй<ret>'
 
 declare-user-mode buffers-manipulation
-map global buffers-manipulation a     ': arrange-buffers '     -docstring 'Arrange buffers'
-map global buffers-manipulation d     ': delete-buffer<ret>'   -docstring 'Delete current buffer'
-map global buffers-manipulation D     ': delete-buffer '       -docstring 'Delete specified buffer'
-map global buffers-manipulation <a-d> ': delete-buffer!<ret>'  -docstring 'Delete current buffer (forced)'
-map global buffers-manipulation <a-D> ': delete-buffer! '      -docstring 'Delete specified buffer (forced)'
-map global buffers-manipulation n     ': buffer-next<ret>'     -docstring 'Next buffer'
-map global buffers-manipulation p     ': buffer-previous<ret>' -docstring 'Previous buffer'
-map global buffers-manipulation r     ': rename-buffer '       -docstring 'Rename current buffer'
+map -docstring 'Arrange buffers' \
+    global buffers-manipulation a ': arrange-buffers '
+map -docstring 'Delete current buffer' \
+    global buffers-manipulation d ': delete-buffer<ret>'
+map -docstring 'Delete specified buffer' \
+    global buffers-manipulation D ': delete-buffer '
+map -docstring 'Delete current buffer (forced)' \
+    global buffers-manipulation <a-d> ': delete-buffer!<ret>'
+map -docstring 'Delete specified buffer (forced)' \
+    global buffers-manipulation <a-D> ': delete-buffer! '
+map -docstring 'Next buffer' \
+    global buffers-manipulation n ': buffer-next<ret>'
+map -docstring 'Previous buffer' \
+    global buffers-manipulation p ': buffer-previous<ret>'
+map -docstring 'Rename current buffer' \
+    global buffers-manipulation r ': rename-buffer '
 
 declare-user-mode wrap-selections
-map global wrap-selections (  '\i(<esc>\a)<esc>H'
-map global wrap-selections [  '\i[<esc>\a]<esc>H'
-map global wrap-selections {  '\i{<esc>\a}<esc>H'
-map global wrap-selections <  '\i<lt><esc>\a<gt><esc>H'
-map global wrap-selections \' '\i''<esc>\a''<esc>H'
-map global wrap-selections \" '\i"<esc>\a"<esc>H'
+map -docstring '(selection)' global wrap-selections (  '\i(<esc>\a)<esc>H'
+map -docstring '[selection]' global wrap-selections [  '\i[<esc>\a]<esc>H'
+map -docstring '{selection}' global wrap-selections {  '\i{<esc>\a}<esc>H'
+map -docstring '<selection>' global wrap-selections <  '\i<lt><esc>\a<gt><esc>H'
+map -docstring "'selection'" global wrap-selections \' "\i'<esc>\a'<esc>H"
+map -docstring '"selection"' global wrap-selections \" '\i"<esc>\a"<esc>H'
 
 declare-user-mode git
-map global git d '      : git show-diff<ret>'   -docstring "show-diff"
-map global git D '      : git hide-diff<ret>'   -docstring "hide-diff"
-map global git u '      : git update-diff<ret>' -docstring "update-diff"
-map global git <space> ': git update-diff<ret>' -docstring "update-diff"
+map -docstring 'show-diff' global git d ': git show-diff<ret>'
+map -docstring 'hide-diff' global git D ': git hide-diff<ret>'
+map -docstring 'update-diff' global git u ': git update-diff<ret>'
+map -docstring 'update-diff' global git <space> ': git update-diff<ret>'
 
 declare-user-mode toggle-highlighter
-map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'   -docstring 'Add highlighter buffer/wrap'
-map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
+map -docstring 'Add highlighter buffer/wrap' \
+    global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'
+map -docstring 'Remove highlighter buffer/wrap' \
+    global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>'
 
 declare-user-mode tmux
-map global tmux h ": tmux-repl-horizontal<ret>"      -docstring "repl horisontal"
-map global tmux H ": tmux-terminal-horizontal "      -docstring "terminal horisontal"
-map global tmux k ": enter-user-mode tmux-kak<ret>"  -docstring "open new client in new panel"
-map global tmux v ": tmux-repl-vertical<ret>"        -docstring "repl vertical"
-map global tmux V ": tmux-terminal-vertical "        -docstring "terminal vertical"
-map global tmux w ": tmux-repl-window<ret>"          -docstring "repl window"
-map global tmux W ": tmux-terminal-window "          -docstring "terminal window"
+map -docstring "repl horisontal" global tmux h ": tmux-repl-horizontal<ret>"
+map -docstring "terminal horisontal" global tmux H ": tmux-terminal-horizontal "
+map -docstring "open new client in new panel" global tmux k ": enter-user-mode tmux-kak<ret>"
+map -docstring "repl vertical" global tmux v ": tmux-repl-vertical<ret>"
+map -docstring "terminal vertical" global tmux V ": tmux-terminal-vertical "
+map -docstring "repl window" global tmux w ": tmux-repl-window<ret>"
+map -docstring "terminal window" global tmux W ": tmux-terminal-window "
 
 declare-user-mode tmux-kak
-map global tmux-kak h ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "horisontal"
-map global tmux-kak H ": tmux-terminal-horizontal kak -c %val{session} "     -docstring "horisontal with options"
-map global tmux-kak v ": tmux-terminal-vertical kak -c %val{session}<ret>"   -docstring "vertical"
-map global tmux-kak V ": tmux-terminal-vertical kak -c %val{session} "       -docstring "vertical with options"
-map global tmux-kak w ": tmux-terminal-window kak -c %val{session}<ret>"     -docstring "window"
-map global tmux-kak W ": tmux-terminal-window kak -c %val{session} "         -docstring "window with options"
+map -docstring "horisontal" \
+    global tmux-kak h ": tmux-terminal-horizontal kak -c %val{session}<ret>"
+map -docstring "horisontal with options" \
+    global tmux-kak H ": tmux-terminal-horizontal kak -c %val{session} "
+map -docstring "vertical" \
+    global tmux-kak v ": tmux-terminal-vertical kak -c %val{session}<ret>"
+map -docstring "vertical with options" \
+    global tmux-kak V ": tmux-terminal-vertical kak -c %val{session} "
+map -docstring "window" \
+    global tmux-kak w ": tmux-terminal-window kak -c %val{session}<ret>"
+map -docstring "window with options" \
+    global tmux-kak W ": tmux-terminal-window kak -c %val{session} "
 
 
 # Hooks ########################################################################
