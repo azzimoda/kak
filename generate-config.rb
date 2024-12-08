@@ -1,15 +1,18 @@
 GENERATED_CONFIG_DIR = 'generated'
 EASY_LANGS = 'c cpp cc ruby'.split' '
 HARD_LANGS = 'rust ruby tex latex'.split' '
+ALL_LANGS_RE = (EASY_LANGS + HARD_LANGS).join'|'
 
-all_langs = (EASY_LANGS + HARD_LANGS).join'|'
 
+puts "[Azzy's Generated Config] Ensure the directory for generated config files is created."
 system("mkdir -p ~/.config/kak/#{GENERATED_CONFIG_DIR}")
 
+OPTION = 'lspEnableWindowHook'
+print "[Azzy's Generated Config] Generating config by option `#{OPTION}`... "
 text = case ARGV[0]
-when 'lspEnableWindowHook'
+when OPTION
   if `whoami` == 'azzimoda'
-    puts "echo -debug 'Language servers of some languages will be ignored due to you weak laptop.'
+    "echo -debug 'Language some language servers will be ignored because of your weak laptop.'
 hook global WinSetOption filetype=(#{EASY_LANGS}) %{
     set-option window lsp_auto_highlight_references true
     set-option window lsp_hover_anchor false
@@ -18,8 +21,8 @@ hook global WinSetOption filetype=(#{EASY_LANGS}) %{
     lsp-enable-window
 }"
   else
-    puts "hook global WinSetOption filetype=(#{all_langs}) %{
-        set-option window lsp_auto_highlight_references true
+    "hook global WinSetOption filetype=(#{ALL_LANGS_RE}) %{
+    set-option window lsp_auto_highlight_references true
     set-option window lsp_hover_anchor false
     lsp-auto-hover-enable
     echo -debug \"Enabling LSP for filtetype %opt{filetype}\"
@@ -27,5 +30,6 @@ hook global WinSetOption filetype=(#{EASY_LANGS}) %{
 }"
   end
 end
-File.write "#{GENERATED_CONFIG_DIR}/lspEnableWindowHook.kak", text
+File.write "#{GENERATED_CONFIG_DIR}/#{OPTION}.kak", text
+puts "[Done]"
 
