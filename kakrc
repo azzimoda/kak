@@ -17,6 +17,12 @@ source "%val{config}/plugins/wakatime.kak/wakatime.kak"
 plug "wakatime.kak" noload
 
 
+plug "insipx/kak-crosshairs"
+
+
+plug 'jjk96/kakoune-rainbow'
+
+
 plug "gustavo-hms/luar" %{
     require-module luar
 }
@@ -158,6 +164,8 @@ map -docstring 'LSP class interface or struct' \
     global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'
 
 # My mappings
+map global normal <ret> ': enter-user-mode peneira-shotcuts<ret>'
+
 map -docstring 'Goto next TODO' \
     global goto G '<esc>/\bTODO\b<ret>'
 map -docstring 'Goto previous TODO' \
@@ -276,6 +284,9 @@ map -docstring "window with options" \
 hook global WinCreate .* %{
     powerline-separator half-step
     powerline-theme solarized-dark-termcolors
+
+    rainbow-enable
+
 }
 
 hook global -group kak-lsp-servers BufSetOption filetype=ruby %{
@@ -337,7 +348,10 @@ hook global BufSetOption filetype=(ruby|html) %{
 
 # Config #######################################################################
 
-colorscheme solarized-dark-termcolors
+colorscheme solarized-dark
 
 add-highlighter global/ number-lines -relative
+add-highlighter global/ show-whitespaces
+
+crosshairs
 
