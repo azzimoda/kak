@@ -37,6 +37,12 @@ plug "gustavo-hms/luar" %{
 
 plug "gustavo-hms/peneira" %{
     require-module peneira
+} config %{
+    define-command peneira-buffers %{
+        peneira 'buffers: ' %{ printf '%s\n' $kak_quoted_buflist } %{
+            buffer %arg{1}
+        }
+    }
 }
 
 # plug "andreyorst/fzf.kak" config %{
@@ -143,15 +149,6 @@ define-command -params 1 -docstring 'read <filename>: open the given filename in
 alias global W write-all
 alias global trans translate
 
-# Peneira
-
-define-command peneira-buffers %{
-    peneira 'buffers: ' %{ printf '%s\n' $kak_quoted_buflist } %{
-        buffer %arg{1}
-    }
-}
-
-
 # Mappings ######################################################################
 
 # kak-lsp
@@ -179,8 +176,6 @@ map -docstring 'Goto next TODO' \
 map -docstring 'Goto previous TODO' \
     global goto <a-G> '<esc><a-/>\bTODO\b<ret>'
 
-map -docstring 'Penetria shotcuts' \
-    global user <ret> ': enter-user-mode peneira-shotcuts<ret>'
 map -docstring 'Buffers matipulation' \
     global user b ': enter-user-mode buffers-manipulation<ret>'
 map -docstring 'Git command' \
