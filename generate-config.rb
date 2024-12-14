@@ -1,11 +1,11 @@
-GENERATED_CONFIG_DIR = 'generated'
+GENERATED_CONFIG_DIR = "#{`echo $HOME`.chomp}/.config/kak/generated"
 EASY_LANGS = 'c cpp cc ruby'.split' '
 HARD_LANGS = 'rust ruby tex latex'.split' '
 ALL_LANGS_RE = (EASY_LANGS + HARD_LANGS).join'|'
 
 
 puts "[Azzy's Generated Config] Ensure the directory for generated config files is created."
-system("mkdir -p ~/.config/kak/#{GENERATED_CONFIG_DIR}")
+system("mkdir -p #{GENERATED_CONFIG_DIR}")
 
 OPTION = 'lspEnableWindowHook'
 print "[Azzy's Generated Config] Generating config by option `#{OPTION}`... "
