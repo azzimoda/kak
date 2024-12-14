@@ -21,7 +21,7 @@ plug "occivink/kakoune-phantom-selection" config %{
     map global normal \' ': phantom-selection-add-selection<ret>'
     map global normal <a-'> ': phantom-selection-select-all<ret>: phantom-selection-clear<ret>'
     map global normal <c-n> ': phantom-selection-iterate-next<ret>'
-    kek map global normal <c-p> ': phantom-selection-iterate-prev<ret>'
+    map global normal <c-p> ': phantom-selection-iterate-prev<ret>'
 }
 
 
