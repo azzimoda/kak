@@ -178,6 +178,8 @@ map -docstring 'Goto previous TODO' \
 
 map -docstring 'Buffers matipulation' \
     global user b ': enter-user-mode buffers-manipulation<ret>'
+map -docstring 'Favourite colorschemes' \
+    global user c ': enter-user-mode fav-schemes<ret>'
 map -docstring 'Git command' \
     global user g ': enter-user-mode git<ret>'
 map -docstring 'Toggle highlighter' \
@@ -238,6 +240,10 @@ map -docstring 'Previous buffer' \
 map -docstring 'Rename current buffer' \
     global buffers-manipulation r ': rename-buffer '
 
+declare-user-mode fav-schemes
+map -docstring 'solarized-dark' global fav-schemes s ': colorscheme solarized-dark<ret>'
+map -docstring 'dracula'        global fav-schemes d ': colorscheme dracula<ret>'
+
 declare-user-mode wrap-selections
 map -docstring '(selection)' global wrap-selections (  '\i(<esc>\a)<esc>H'
 map -docstring '[selection]' global wrap-selections [  '\i[<esc>\a]<esc>H'
@@ -253,6 +259,12 @@ map -docstring 'update-diff' global git u ': git update-diff<ret>'
 map -docstring 'update-diff' global git <space> ': git update-diff<ret>'
 
 declare-user-mode toggle-highlighter
+map -docstring 'Toggle cursor line highlighting' \
+    global toggle-highlighter c ': cursorline<ret>'
+map -docstring 'Toggle cursor crosshairs' \
+    global toggle-highlighter <a-c> ': crosshairs<ret>'
+map -docstring 'Toggle cursor column highlighting' \
+    global toggle-highlighter l ': cursorcolumn<ret>'
 map -docstring 'Add highlighter buffer/wrap' \
     global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>'
 map -docstring 'Remove highlighter buffer/wrap' \
@@ -289,7 +301,6 @@ hook global WinCreate .* %{
     powerline-theme solarized-dark-termcolors
 
     rainbow-enable
-
 }
 
 hook global -group kak-lsp-servers BufSetOption filetype=ruby %{
@@ -351,10 +362,12 @@ hook global BufSetOption filetype=(ruby|html) %{
 
 # Config #######################################################################
 
-colorscheme solarized-dark
+# colorscheme solarized-dark
+# colorscheme gruvbox-dark
+colorscheme dracula
 
 add-highlighter global/ number-lines -relative
 add-highlighter global/ show-whitespaces
 
-crosshairs
+cursorline
 
