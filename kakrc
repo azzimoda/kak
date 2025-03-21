@@ -1,4 +1,4 @@
-echo -debug %sh{ruby ~/.config/kak/generate-config.rb lspEnableWindowHook}
+# echo -debug %sh{ruby ~/.config/kak/generate-config.rb lspEnableWindowHook}
 
 # Plugins ######################################################################
 
@@ -12,9 +12,18 @@ evaluate-commands %sh{
 }
 plug "andreyorst/plug.kak" noload
 
+plug "insipx/kak-crosshairs"
+plug 'jjk96/kakoune-rainbow'
 
 source "%val{config}/plugins/wakatime.kak/wakatime.kak"
 plug "wakatime.kak" noload
+
+plug "gustavo-hms/luar" %{ require-module luar }
+
+plug "andreyorst/fzf.kak" config %{ map global normal <c-p> ': fzf-mode<ret>' } # defer module-name { settings }
+
+plug "alexherbo2/auto-pairs.kak"
+enable-auto-pairs
 
 
 plug "occivink/kakoune-phantom-selection" config %{
@@ -25,34 +34,10 @@ plug "occivink/kakoune-phantom-selection" config %{
 }
 
 
-plug "insipx/kak-crosshairs"
-
-
-plug 'jjk96/kakoune-rainbow'
-
-
-plug "gustavo-hms/luar" %{
-    require-module luar
+plug "delapouite/kakoune-buffers" %{
+    map global normal <c-a> ': enter-buffers-mode<ret>' -docstring 'buffers'
+    map global normal <c-A> ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)'
 }
-
-plug "gustavo-hms/peneira" %{
-    require-module peneira
-} config %{
-    define-command peneira-buffers %{
-        peneira 'buffers: ' %{ printf '%s\n' $kak_quoted_buflist } %{
-            buffer %arg{1}
-        }
-    }
-}
-
-# plug "andreyorst/fzf.kak" config %{
-#     map global normal <c-p> ': fzf-mode<ret>'
-# } defer <module-name> %{
-#     <settings of module>
-# }
-
-plug "alexherbo2/auto-pairs.kak"
-enable-auto-pairs
 
 
 plug "mesabloo/tex-input.kak" config %{
@@ -85,7 +70,7 @@ plug "andreyorst/smarttab.kak" defer %{
 #     kaktree-enable
 # }
 
-plug "kak-lsp/kak-lsp" do %{
+plug "kakoune-lsp/kakoune-lsp" do %{
     cargo build --release --locked
     cargo install --force --path .
 } config %{
@@ -111,14 +96,14 @@ plug "kak-lsp/kak-lsp" do %{
         lsp-find-error --previous --include-warnings
     }
 
-    source "%val{config}/generated/lspEnableWindowHook.kak"
-    # hook global WinSetOption filetype=(c|cpp|cc|rust|ruby|tex|latex) %{
-    #     set-option window lsp_auto_highlight_references true
-    #     set-option window lsp_hover_anchor false
-    #     lsp-auto-hover-enable
-    #     echo -debug "Enabling LSP for filtetype %opt{filetype}"
-    #     lsp-enable-window
-    # }
+    # source "%val{config}/generated/lspEnableWindowHook.kak"
+    hook global WinSetOption filetype=(c|cpp|cc|rust|ruby|tex|latex) %{
+        set-option window lsp_auto_highlight_references true
+        set-option window lsp_hover_anchor false
+        lsp-auto-hover-enable
+        echo -debug "Enabling LSP for filtetype %opt{filetype}"
+        lsp-enable-window
+    }
 
     hook global WinSetOption filetype=(rust) %{
         set window lsp_server_configuration rust.clippy_preference="on"
@@ -133,6 +118,25 @@ plug "kak-lsp/kak-lsp" do %{
     }
 
     hook global KakEnd .* lsp-exit
+
+    map -docstring 'LSP mode' \
+        global user l ': enter-user-mode lsp<ret>'
+
+    map -docstring 'Select next snippet placeholder' \
+        global insert <tab> \
+        '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>'
+    map -docstring 'LSP any symbol' \
+        global object a '<a-semicolon>lsp-object<ret>'
+    map -docstring 'LSP any symbol' \
+        global object <a-a> '<a-semicolon>lsp-object<ret>'
+    map -docstring 'LSP errors and warnings' \
+        global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>'
+    map -docstring 'LSP errors' \
+        global object D '<a-semicolon>lsp-diagnostic-object<ret>'
+    map -docstring 'LSP function or method' \
+        global object f '<a-semicolon>lsp-object Function Method<ret>'
+    map -docstring 'LSP class interface or struct' \
+        global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'
 }
 
 # Commands #####################################################################
@@ -150,107 +154,46 @@ alias global W write-all
 alias global trans translate
 
 # Mappings ######################################################################
+map global goto G '<esc>/\bTODO\b<ret>' -docstring 'Goto next TODO'
+map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
 
-# kak-lsp
-map -docstring 'Select next snippet placeholder' \
-    global insert <tab> \
-    '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>'
-map -docstring 'LSP any symbol' \
-    global object a '<a-semicolon>lsp-object<ret>'
-map -docstring 'LSP any symbol' \
-    global object <a-a> '<a-semicolon>lsp-object<ret>'
-map -docstring 'LSP errors and warnings' \
-    global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>'
-map -docstring 'LSP errors' \
-    global object D '<a-semicolon>lsp-diagnostic-object<ret>'
-map -docstring 'LSP function or method' \
-    global object f '<a-semicolon>lsp-object Function Method<ret>'
-map -docstring 'LSP class interface or struct' \
-    global object t '<a-semicolon>lsp-object Class Interface Struct<ret>'
-
-# My mappings
-map global normal <ret> ': enter-user-mode peneira-shotcuts<ret>'
-
-map -docstring 'Goto next TODO' \
-    global goto G '<esc>/\bTODO\b<ret>'
-map -docstring 'Goto previous TODO' \
-    global goto <a-G> '<esc><a-/>\bTODO\b<ret>'
-
-map -docstring 'Buffers matipulation' \
-    global user b ': enter-user-mode buffers-manipulation<ret>'
-map -docstring 'Favourite colorschemes' \
-    global user c ': enter-user-mode fav-schemes<ret>'
-map -docstring 'Git command' \
-    global user g ': enter-user-mode git<ret>'
-map -docstring 'Toggle highlighter' \
-    global user h ': enter-user-mode toggle-highlighter<ret>'
-map -docstring 'LSP mode' \
-    global user l ': enter-user-mode lsp<ret>'
-map -docstring 'Paste after selection from system clipboard' \
-    global user p '<a-!>xsel -o -b<ret>'
-map -docstring 'Paste before selection from system clipboard' \
-    global user P '!xsel -o -b<ret>'
-map -docstring 'Crazy Powerline custom separators' \
-    global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>'
-map -docstring 'Replace selection from system clipboard' \
-    global user R 'd!xsel -o -b<ret>'
-map -docstring 'tmux' \
-    global user t ': enter-user-mode tmux<ret>'
-map -docstring 'Toggle TeX input' \
-    global user T ': tex-input-toggle<ret>'
-map -docstring 'Yank to system clipboard' \
-    global user y '<a-|>xsel -i -b<ret>'
-map -docstring 'Run a shell prompt' \
-    global user : ':echo -debug %sh{  }<left><left>'
-map -docstring '(Un)comment line' \
-    global user / ':comment-line<ret>'
-map -docstring 'Chose a bracket to wrap the selection' \
-    global user [ ': enter-user-mode wrap-selections<ret>'
-
-declare-user-mode peneira-shotcuts
-map global peneira-shotcuts -docstring 'buffers'     b ':peneira-buffers<ret>'
-map global peneira-shotcuts -docstring 'files'       f ':peneira-files<ret>'
-map global peneira-shotcuts -docstring 'local files' F ':peneira-local-files<ret>'
-map global peneira-shotcuts -docstring 'lines'       l ':peneira-lines<ret>'
-map global peneira-shotcuts -docstring 'symbols'     s ':peneira-symbols<ret>'
+map global user b ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
+map global user c ':comment-line<ret>' -docstring '(Un)comment line'
+map global user g ': enter-user-mode git<ret>' -docstring 'Git command'
+map global user h ': enter-user-mode toggle-highlighter<ret>' -docstring 'Toggle highlighter'
+map global user p '<a-!>xsel -o -b<ret>' -docstring 'Paste after selection from system clipboard'
+map global user P '!xsel -o -b<ret>' -docstring 'Paste before selection from system clipboard'
+map global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>' -docstring 'Crazy Powerline custom separators'
+map global user R 'd!xsel -o -b<ret>' -docstring 'Replace selection from system clipboard'
+map global user t ': enter-user-mode tmux<ret>' -docstring 'tmux'
+map global user T ': tex-input-toggle<ret>' -docstring 'Toggle TeX input'
+map global user y '<a-|>xsel -i -b<ret>' -docstring 'Yank to system clipboard'
+map global user : ':echo -debug %sh{  }<left><left>' -docstring 'Run a shell prompt'
+    # map -docstring 'Chose a bracket to wrap the selection' \
+#     global user [ ': enter-user-mode wrap-selections<ret>'
 
 declare-user-mode crazy-powerline-custom-separators
-map -docstring 'Default (half-step)' \
-    global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>'
-map -docstring '42 5' \
-    global crazy-powerline-custom-separators 5 ': powerline-separator custom 42 5<ret>'
-map -docstring 'с**и х**' \
-    global crazy-powerline-custom-separators x ': powerline-separator custom саси хуй<ret>'
+map global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>' -docstring 'Default (half-step)'
+map global crazy-powerline-custom-separators 5 ': powerline-separator custom 42 5<ret>' -docstring '42 5'
+map global crazy-powerline-custom-separators x ': powerline-separator custom саси хуй<ret>' -docstring 'с**и х**'
 
 declare-user-mode buffers-manipulation
-map -docstring 'Arrange buffers' \
-    global buffers-manipulation a ': arrange-buffers '
-map -docstring 'Delete current buffer' \
-    global buffers-manipulation d ': delete-buffer<ret>'
-map -docstring 'Delete specified buffer' \
-    global buffers-manipulation D ': delete-buffer '
-map -docstring 'Delete current buffer (forced)' \
-    global buffers-manipulation <a-d> ': delete-buffer!<ret>'
-map -docstring 'Delete specified buffer (forced)' \
-    global buffers-manipulation <a-D> ': delete-buffer! '
-map -docstring 'Next buffer' \
-    global buffers-manipulation n ': buffer-next<ret>'
-map -docstring 'Previous buffer' \
-    global buffers-manipulation p ': buffer-previous<ret>'
-map -docstring 'Rename current buffer' \
-    global buffers-manipulation r ': rename-buffer '
+map global buffers-manipulation a ': arrange-buffers ' -docstring 'Arrange buffers'
+map global buffers-manipulation d ': delete-buffer<ret>' -docstring 'Delete current buffer'
+map global buffers-manipulation D ': delete-buffer ' -docstring 'Delete specified buffer'
+map global buffers-manipulation <a-d> ': delete-buffer!<ret>' -docstring 'Delete current buffer (forced)'
+map global buffers-manipulation <a-D> ': delete-buffer! ' -docstring 'Delete specified buffer (forced)'
+map global buffers-manipulation n ': buffer-next<ret>' -docstring 'Next buffer'
+map global buffers-manipulation p ': buffer-previous<ret>' -docstring 'Previous buffer'
+map global buffers-manipulation r ': rename-buffer ' -docstring 'Rename current buffer'
 
-declare-user-mode fav-schemes
-map -docstring 'solarized-dark' global fav-schemes s ': colorscheme solarized-dark<ret>'
-map -docstring 'dracula'        global fav-schemes d ': colorscheme dracula<ret>'
-
-declare-user-mode wrap-selections
-map -docstring '(selection)' global wrap-selections (  '\i(<esc>\a)<esc>H'
-map -docstring '[selection]' global wrap-selections [  '\i[<esc>\a]<esc>H'
-map -docstring '{selection}' global wrap-selections {  '\i{<esc>\a}<esc>H'
-map -docstring '<selection>' global wrap-selections <  '\i<lt><esc>\a<gt><esc>H'
-map -docstring "'selection'" global wrap-selections \' "\i'<esc>\a'<esc>H"
-map -docstring '"selection"' global wrap-selections \" '\i"<esc>\a"<esc>H'
+# declare-user-mode wrap-selections
+# map -docstring '(selection)' global wrap-selections (  '\i(<esc>\a)<esc>H'
+# map -docstring '[selection]' global wrap-selections [  '\i[<esc>\a]<esc>H'
+# map -docstring '{selection}' global wrap-selections {  '\i{<esc>\a}<esc>H'
+# map -docstring '<selection>' global wrap-selections <  '\i<lt><esc>\a<gt><esc>H'
+# map -docstring "'selection'" global wrap-selections \' "\i'<esc>\a'<esc>H"
+# map -docstring '"selection"' global wrap-selections \" '\i"<esc>\a"<esc>H'
 
 declare-user-mode git
 map -docstring 'show-diff' global git d ': git show-diff<ret>'
@@ -363,8 +306,8 @@ hook global BufSetOption filetype=(ruby|html) %{
 # Config #######################################################################
 
 # colorscheme solarized-dark
-# colorscheme gruvbox-dark
-colorscheme dracula
+colorscheme gruvbox-dark
+# colorscheme dracula
 
 add-highlighter global/ number-lines -relative
 add-highlighter global/ show-whitespaces
