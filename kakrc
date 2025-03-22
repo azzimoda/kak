@@ -56,7 +56,7 @@ plug "mesabloo/tex-input.kak" config %{
 
 
 plug "andreyorst/powerline.kak" defer powerline %{
-    powerline-format global 'mode_info smarttab lsp git session client bufname line_column position codepoint'
+    powerline-format global 'mode_info lsp git session client bufname line_column position'
 } defer powerline_gruvbox %{
     powerline-theme gruvbox
 } config %{
@@ -119,11 +119,9 @@ plug "kakoune-lsp/kakoune-lsp" do %{
         lsp-enable-window
     }
 
-    hook global WinSetOption filetype=(rust) %{
-        set window lsp_server_configuration rust.clippy_preference="on"
-    }
 
     hook global WinSetOption filetype=rust %{
+        set window lsp_server_configuration rust.clippy_preference="on"
         hook window BufWritePre .* %{
             evaluate-commands %sh{
                 test -f rustfmt.toml && printf lsp-formatting-sync
@@ -133,8 +131,7 @@ plug "kakoune-lsp/kakoune-lsp" do %{
 
     hook global KakEnd .* lsp-exit
 
-    map -docstring 'LSP mode' \
-        global user l ': enter-user-mode lsp<ret>'
+    map global user l ': enter-user-mode lsp<ret>' -docstring 'LSP mode'
 
     map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' \
         -docstring 'Select next snippet placeholder'
@@ -151,12 +148,6 @@ plug "kakoune-lsp/kakoune-lsp" do %{
 
     hook global -group lsp-filetype-ruby BufSetOption filetype=ruby %{
         set-option buffer lsp_servers %exp{
-            # [solargraph]
-            # root = "%sh{eval " $kak_opt_lsp_find_root " Gemfile Gemfile.lock $(: kak_buffile)}"
-            # command = "solargraph"
-            # args = [ "stdio" ]
-            # settings_section = "solargraph"
-            # [solargraph.settings.solargraph]
             [solargraph]
             root_globs = ["Gemfile"]
             args = ["stdio"]
@@ -191,12 +182,10 @@ plug "kakoune-lsp/kakoune-lsp" do %{
         echo -debug 'LS `dls` is configured.'
     }
     hook global -group kak-lsp-servers BufSetOption filetype=(c|cpp) %{
-        set-option buffer lsp_servers %exp{
-            [clangd]
-            root = "%sh{eval " $kak_opt_lsp_find_root " .clangd $(: kak_buffile)}"
-            settings_section = "clangd"
-            [clangd.settings.clangd]
-        }
+        # set-option buffer lsp_servers %exp{
+        #     [clangd]
+        #     args = [""]
+        # }
         echo -debug 'LS `clangd` is configured.'
     }
     hook global -group kak-lsp-servers BufSetOption filetype=(tex|latex) %{
@@ -272,6 +261,18 @@ map global toggle-highlighter <a-c> ': crosshairs<ret>' -docstring 'Toggle curso
 map global toggle-highlighter l ': cursorcolumn<ret>' -docstring 'Toggle cursor column highlighting'
 map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>' -docstring 'Add highlighter buffer/wrap'
 map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
+
+map global normal <c-w> ": enter-user-mode vim-windows<ret>"
+declare-user-mode vim-windows # actually it is like in Helix :)
+map global vim-windows w ":echo -debug Not yet.<ret>" -docstring "Goto next window"
+map global vim-windows <c-w> ":echo -debug Not yet.<ret>" -docstring "Goto next window"
+map global vim-windows s ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
+map global vim-windows <c-s> ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
+map global vim-windows v ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
+map global vim-windows <c-v> ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
+map global vim-windows q ":q<ret>" -docstring "Quit window"
+map global vim-windows <c-q> ":q<ret>" -docstring "Quit window"
+# TODO: Vim-like window navigation key mappings.
 
 declare-user-mode tmux
 map global tmux h ": tmux-repl-horizontal<ret>" -docstring "repl horisontal"
