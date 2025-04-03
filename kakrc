@@ -15,7 +15,11 @@ plug "andreyorst/plug.kak" noload
 plug "insipx/kak-crosshairs"
 plug 'jjk96/kakoune-rainbow'
 
-source "%val{config}/plugins/wakatime.kak/wakatime.kak"
+try %{
+    source "%val{config}/plugins/wakatime.kak/wakatime.kak"
+} catch %{
+    echo -debug "ERROR: Wakatime is not installed!"
+}
 plug "wakatime.kak" noload
 
 plug "gustavo-hms/luar" %{ require-module luar }
@@ -215,8 +219,8 @@ alias global trans translate
 
 #### Mappings ####
 
-map global goto G '<esc>/\bTODO\b<ret>' -docstring 'Goto next TODO'
-map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
+# map global goto G '<esc>/\bTODO\b<ret>' -docstring 'Goto next TODO'
+# map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
 
 map global user b ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
 map global user c ': comment-line<ret>' -docstring '(Un)comment line'
