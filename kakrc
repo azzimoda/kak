@@ -306,7 +306,7 @@ hook global WinCreate .* %{
 }
 
 
-hook global BufSetOption filetype=(ruby|html) %{
+hook global BufSetOption filetype=(ruby|eruby|html) %{
     set-option buffer indentwidth 2
 }
 
