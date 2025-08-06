@@ -1,5 +1,3 @@
-# echo -debug %sh{ruby ~/.config/kak/generate-config.rb lspEnableWindowHook}
-
 #### Plugins ####
 
 evaluate-commands %sh{
@@ -7,7 +5,7 @@ evaluate-commands %sh{
     mkdir -p "$plugins"
     [ ! -e "$plugins/plug.kak" ] && \
         git clone -q https://github.com/andreyorst/plug.kak.git \
-            "$plugins/plug.kak"
+        "$plugins/plug.kak"
     printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
 }
 plug "andreyorst/plug.kak" noload
@@ -24,10 +22,14 @@ plug "wakatime.kak" noload
 
 plug "gustavo-hms/luar" %{ require-module luar }
 
-plug "andreyorst/fzf.kak" config %{ map global normal <c-p> ': fzf-mode<ret>' } # defer module-name { settings }
+plug "andreyorst/fzf.kak" config %{ map global normal <ret> ': fzf-mode<ret>' } # defer module-name { settings }
 
-plug "alexherbo2/auto-pairs.kak"
-enable-auto-pairs
+plug "alexherbo2/auto-pairs.kak" %{ hook global WinCreate .* %{ enable-auto-pairs } }
+
+# plug "lePerdu/kakboard" %{ hook global WinCreate .* %{ kakboard-enable } }
+
+plug "mesabloo/tex-input.kak" config %{ tex-input-setup }
+
 
 plug "h-youhei/kakoune-surround" config %{
     map global normal m ': enter-user-mode surround<ret>'
@@ -49,13 +51,9 @@ plug "occivink/kakoune-phantom-selection" config %{
 
 
 plug "delapouite/kakoune-buffers" %{
-    map global normal <c-a> ': enter-buffers-mode<ret>' -docstring 'buffers'
-    map global normal <c-A> ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)'
-}
-
-
-plug "mesabloo/tex-input.kak" config %{
-    tex-input-setup
+    map global normal <c-space> ': enter-buffers-mode<ret>' -docstring 'buffers'
+    map global normal <c-a-space> ': enter-user-mode -lock buffers<ret>' -docstring 'buffers (lock)'
+    map global user <space> ': enter-buffers-mode<ret>' -docstring 'buffers'
 }
 
 
@@ -162,11 +160,11 @@ plug "kakoune-lsp/kakoune-lsp" do %{
             root_globs = ["Gemfile"]
             args = ["--lsp"]
 
-            [ruby-lsp]
-            root_globs = ["Gemfile"]
-            args = ["stdio"]
+            # [ruby-lsp]
+            # root_globs = ["Gemfile"]
+            # args = ["stdio"]
         }
-        echo -debug 'Language servers: solargraph, standardrb, ruby-lsp'
+        echo -debug 'Language servers: standardrb, ruby-lsp'
     }
     hook global -group kak-lsp-servers BufSetOption filetype=rust %{
         set-option buffer lsp_servers %exp{
@@ -222,36 +220,17 @@ alias global trans translate
 # map global goto G '<esc>/\bTODO\b<ret>' -docstring 'Goto next TODO'
 # map global goto <a-G> '<esc><a-/>\bTODO\b<ret>' -docstring 'Goto previous TODO'
 
-map global user b ': enter-user-mode buffers-manipulation<ret>' -docstring 'Buffers matipulation'
 map global user c ': comment-line<ret>' -docstring '(Un)comment line'
 map global user C ': comment-block<ret>' -docstring 'Comment block'
 map global user g ': enter-user-mode git<ret>' -docstring 'Git command'
 map global user h ': enter-user-mode toggle-highlighter<ret>' -docstring 'Toggle highlighter'
-map global user p '<a-!>xsel -o -b<ret>' -docstring 'Paste after selection from system clipboard'
-map global user P '!xsel -o -b<ret>' -docstring 'Paste before selection from system clipboard'
-map global user <a-p> ': enter-user-mode crazy-powerline-custom-separators<ret>' \
-    -docstring 'Crazy Powerline custom separators'
+map global user p '<a-!>xsel -o -b<ret>' -docstring 'Paste after from system'
+map global user P '!xsel -o -b<ret>' -docstring 'Paste before from system'
 map global user R 'd!xsel -o -b<ret>' -docstring 'Replace selection from system clipboard'
 map global user t ': enter-user-mode tmux<ret>' -docstring 'tmux'
 map global user T ': tex-input-toggle<ret>' -docstring 'Toggle TeX input'
 map global user y '<a-|>xsel -i -b<ret>' -docstring 'Yank to system clipboard'
 map global user : ':echo -debug %sh{  }<left><left>' -docstring 'Run a shell prompt and print it to debug'
-
-declare-user-mode crazy-powerline-custom-separators
-map global crazy-powerline-custom-separators <space> ': powerline-separator half-step<ret>' \
-    -docstring 'Default (half-step)'
-map global crazy-powerline-custom-separators 5 ': powerline-separator custom 42 5<ret>' -docstring '42 5'
-map global crazy-powerline-custom-separators x ': powerline-separator custom саси хуй<ret>' -docstring 'с**и х**'
-
-declare-user-mode buffers-manipulation
-map global buffers-manipulation a ': arrange-buffers ' -docstring 'Arrange buffers'
-map global buffers-manipulation d ': delete-buffer<ret>' -docstring 'Delete current buffer'
-map global buffers-manipulation D ': delete-buffer ' -docstring 'Delete specified buffer'
-map global buffers-manipulation <a-d> ': delete-buffer!<ret>' -docstring 'Delete current buffer (forced)'
-map global buffers-manipulation <a-D> ': delete-buffer! ' -docstring 'Delete specified buffer (forced)'
-map global buffers-manipulation n ': buffer-next<ret>' -docstring 'Next buffer'
-map global buffers-manipulation p ': buffer-previous<ret>' -docstring 'Previous buffer'
-map global buffers-manipulation r ': rename-buffer ' -docstring 'Rename current buffer'
 
 declare-user-mode git
 map global git d ': git show-diff<ret>' -docstring 'show-diff'
@@ -266,47 +245,42 @@ map global toggle-highlighter l ': cursorcolumn<ret>' -docstring 'Toggle cursor 
 map global toggle-highlighter w ': add-highlighter buffer/ wrap<ret>' -docstring 'Add highlighter buffer/wrap'
 map global toggle-highlighter W ': remove-highlighter buffer/wrap<ret>' -docstring 'Remove highlighter buffer/wrap'
 
-map global normal <c-w> ": enter-user-mode vim-windows<ret>"
-declare-user-mode vim-windows # actually it is like in Helix :)
-map global vim-windows w ":echo -debug Not yet.<ret>" -docstring "Goto next window"
-map global vim-windows <c-w> ":echo -debug Not yet.<ret>" -docstring "Goto next window"
-map global vim-windows s ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
-map global vim-windows <c-s> ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
-map global vim-windows v ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
-map global vim-windows <c-v> ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
-map global vim-windows q ":q<ret>" -docstring "Quit window"
-map global vim-windows <c-q> ":q<ret>" -docstring "Quit window"
-# TODO: Vim-like window navigation key mappings.
+evaluate-commands %sh{
+    if [ -n "$ZELLIJ" ]; then
+        echo 'map global normal <c-w> ": enter-user-mode zellij-windows<ret>"'
+    elif [ -n "$TMUX" ]; then
+        echo 'map global normal <c-w> ": enter-user-mode tmux-windows<ret>"'
+    fi
+}
 
-declare-user-mode tmux
-map global tmux h ": tmux-repl-horizontal<ret>" -docstring "repl horisontal"
-map global tmux H ": tmux-terminal-horizontal " -docstring "terminal horisontal"
-map global tmux k ": enter-user-mode tmux-kak<ret>" -docstring "open new client in new panel"
-map global tmux v ": tmux-repl-vertical<ret>" -docstring "repl vertical"
-map global tmux V ": tmux-terminal-vertical " -docstring "terminal vertical"
-map global tmux w ": tmux-repl-window<ret>" -docstring "repl window"
-map global tmux W ": tmux-terminal-window " -docstring "terminal window"
+# map global normal <c-w> ": enter-user-mode windows<ret>"
+# declare-user-mode windows
+# map global windows t ": enter-user-mode tmux-windows<ret>" -docstring 'tmux'
+# map global windows z ": enter-user-mode zellij-windows<ret>" -docstring 'zellij'
 
-declare-user-mode tmux-kak
-map global tmux-kak h ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "horisontal"
-map global tmux-kak H ": tmux-terminal-horizontal kak -c %val{session} " -docstring "horisontal with options"
-map global tmux-kak v ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "vertical"
-map global tmux-kak V ": tmux-terminal-vertical kak -c %val{session} " -docstring "vertical with options"
-map global tmux-kak w ": tmux-terminal-window kak -c %val{session}<ret>" -docstring "window"
-map global tmux-kak W ": tmux-terminal-window kak -c %val{session} " -docstring "window with options"
+declare-user-mode tmux-windows
+map global tmux-windows s ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
+map global tmux-windows <c-s> ": tmux-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontally"
+map global tmux-windows v ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
+map global tmux-windows <c-v> ": tmux-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertivally"
 
+declare-user-mode zellij-windows
+map global zellij-windows s ": zellij-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontal"
+map global zellij-windows <c-s> ": zellij-terminal-horizontal kak -c %val{session}<ret>" -docstring "Split horizontal"
+map global zellij-windows v ": zellij-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertical"
+map global zellij-windows <c-v> ": zellij-terminal-vertical kak -c %val{session}<ret>" -docstring "Split vertical"
 
 #### Hooks ####
 
 hook global WinCreate .* %{
-    powerline-separator triangle
+    powerline-separator half-step
     powerline-theme solarized-dark-termcolors
 
     rainbow-enable
 }
 
 
-hook global BufSetOption filetype=(ruby|eruby|html) %{
+hook global BufSetOption filetype=(ruby|eruby|html|yaml) %{
     set-option buffer indentwidth 2
 }
 
